@@ -47,7 +47,7 @@ Future<void> main() async {
     final deviceInfo = await deviceInfoPlugin.iosInfo;
     await StorageBox.instance.setDeviceID(deviceInfo.identifierForVendor);
   }
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
