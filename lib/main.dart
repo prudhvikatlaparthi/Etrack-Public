@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
-import 'package:e_track/screens/common/loader.dart';
 import 'package:e_track/utils/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -52,7 +51,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +62,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: colorPrimary),
           useMaterial3: true,
           textTheme: GoogleFonts.redHatDisplayTextTheme()),
-      home: LoginScreen(),
+      home: const LoginScreen(),
     );
   }
 }

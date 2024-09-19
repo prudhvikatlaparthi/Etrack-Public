@@ -131,9 +131,9 @@ class AppDrawer extends StatelessWidget {
   }
 
   ImageProvider getProfileImage() {
-    var profilePic = StorageBox.instance.getProfilePic();
-    if (profilePic.isNotNullOrEmpty) {
-      return NetworkImage(profilePic!);
+    final profilePic = StorageBox.instance.getProfilePic();
+    if (profilePic.isNotNullOrEmpty && !profilePic!.contains("uploads/no-image.png")) {
+      return NetworkImage(profilePic);
     } else {
       return const AssetImage("assets/images/icons/user.png");
     }

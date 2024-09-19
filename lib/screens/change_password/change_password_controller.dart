@@ -33,12 +33,13 @@ class ChangePasswordController extends GetxController {
     }
     showLoader();
     try {
+      final newPassword = aesEncrypt(confirmPasswordController.text);
       final response = await ApiService.instance.request(
         '/user/secure_change_password',
         DioMethod.post,
         formData: {
           'old_password': aesEncrypt(currentPasswordController.text),
-          'new_password': aesEncrypt(confirmPasswordController.text),
+          'new_password': newPassword,
           'user_id': StorageBox.instance.getUserId(),
           'device_token': StorageBox.instance.getDeviceID()
         },
@@ -47,6 +48,7 @@ class ChangePasswordController extends GetxController {
       dismissLoader();
       if (response.statusCode == 200) {
         if (response.data['status'] == true) {
+          await StorageBox.instance.setPassword(newPassword!);
           showToast(message: response.data['message']);
           Get.back();
           Get.delete<ChangePasswordController>();
