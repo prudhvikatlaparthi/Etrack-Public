@@ -76,6 +76,11 @@ void kPrintLog(Object? message) {
   }
 }
 
+bool isAdmin() {
+  return StorageBox.instance.getUserType().toLowerCase() ==
+      'Customer'.toLowerCase();
+}
+
 showLoader() {
   kPrintLog("showloader");
   Get.dialog(const PopScope(canPop: false, child: Loader()),

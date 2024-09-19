@@ -49,9 +49,8 @@ class ChangePasswordController extends GetxController {
       if (response.statusCode == 200) {
         if (response.data['status'] == true) {
           await StorageBox.instance.setPassword(newPassword!);
-          showToast(message: response.data['message']);
           Get.back();
-          Get.delete<ChangePasswordController>();
+          showToast(message: response.data['message']);
         } else {
           showToast(message: response.data['message']);
         }

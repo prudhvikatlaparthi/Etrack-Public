@@ -72,7 +72,7 @@ class AppDrawer extends StatelessWidget {
                 Get.back();
               },
             ),
-            StorageBox.instance.isAdmin()
+            isAdmin()
                 ? ListTile(
                     title: const Text(
                       'Employees',
@@ -87,7 +87,7 @@ class AppDrawer extends StatelessWidget {
                       });
                     },
                   )
-                : SizedBox(),
+                : const SizedBox(),
             ListTile(
               title: const Text(
                 'Change Password',

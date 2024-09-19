@@ -1,14 +1,12 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart' as dio;
-import 'package:e_track/screens/common/loader.dart';
 import 'package:e_track/utils/global.dart';
 import 'package:e_track/utils/storagebox.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http_parser/http_parser.dart';
 
 import '../../models/employee.dart';
 import '../../network/api_service.dart';
@@ -16,7 +14,6 @@ import '../../utils/colors.dart';
 import '../../utils/strings.dart';
 
 class AddEmployeeController extends GetxController {
-  
   final zipCodeController = TextEditingController();
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
@@ -45,8 +42,11 @@ class AddEmployeeController extends GetxController {
 
     showLoader();
     try {
+      final endpoint = selectedEmployee.value != null
+          ? 'etrack/edit_my_employee'
+          : 'etrack/create_my_employee';
       final response = await ApiService.instance.request(
-        'etrack/create_my_employee',
+        endpoint,
         DioMethod.post,
         formData: {
           'user_id': StorageBox.instance.getUserId(),
@@ -61,12 +61,19 @@ class AddEmployeeController extends GetxController {
           'district_id': selectedDistrict.value,
           'city_id': '1',
           'zipcode': zipCodeController.text,
+          'pincode': zipCodeController.text,
           'aadhar_number': aadhaarController.text,
           'device_token': StorageBox.instance.getDeviceID(),
+          if (selectedEmployee.value?.employeeId.isNotNullOrEmpty == true)
+            'employee_id': selectedEmployee.value?.employeeId,
+          if (selectedEmployee.value != null)
+            'status': selectedEmployee.value?.status,
+          if (selectedEmployee.value != null)
+            'user_friend_id': selectedEmployee.value?.userFriendId,
           if (profilePic.value != null)
-            'profile_image': dio.MultipartFile.fromFile(profilePic.value!.path,
-                filename: profilePic.value!.name,
-                contentType: MediaType.parse(profilePic.value!.mimeType!))
+            'profile_image': await dio.MultipartFile.fromFile(
+                profilePic.value!.path,
+                filename: profilePic.value!.name)
         },
         contentType: 'application/json',
       );
@@ -74,7 +81,10 @@ class AddEmployeeController extends GetxController {
       if (response.statusCode == 200) {
         if (response.data['status'] == true) {
           Get.back(result: true);
-          showToast(message: "Employee successfully created");
+          showToast(
+              message: selectedEmployee.value != null
+                  ? "Employee successfully updated"
+                  : "Employee successfully created");
         } else {
           showToast(message: response.data['message']);
         }
@@ -126,12 +136,16 @@ class AddEmployeeController extends GetxController {
       showToast(message: "Please provide Address");
       return false;
     }
-    if (aadhaarController.text.isBlank == true) {
-      showToast(message: "Please provide Password");
+    if (zipCodeController.text.isBlank == true ||
+        zipCodeController.text.length > 6 ||
+        zipCodeController.text.length < 6) {
+      showToast(message: "Please provide valid PIN code");
       return false;
     }
-    if (zipCodeController.text.isBlank == true) {
-      showToast(message: "Please provide PIN code");
+    if (aadhaarController.text.isBlank == true ||
+        aadhaarController.text.length > 12 ||
+        aadhaarController.text.length < 12) {
+      showToast(message: "Please provide valid Aadhaar no.");
       return false;
     }
     return true;
@@ -153,7 +167,7 @@ class AddEmployeeController extends GetxController {
               .map<DropdownMenuItem>((e) => DropdownMenuItem(
                     value: e['country_id'],
                     child: Text(e['country'],
-                        style: TextStyle(fontSize: 14, color: colorBlack)),
+                        style: const TextStyle(fontSize: 14, color: colorBlack)),
                   ))
               .toList());
           countries.value = apiCountries;
@@ -270,8 +284,8 @@ class AddEmployeeController extends GetxController {
         DioMethod.post,
         formData: {
           'user_id': StorageBox.instance.getUserId(),
-          'share_user_id': shareUserId,
-          'user_type': 'Customer',
+          'employee_id': shareUserId,
+          'user_type': StorageBox.instance.getUserType(),
           'device_token': StorageBox.instance.getDeviceID(),
         },
         contentType: 'application/json',

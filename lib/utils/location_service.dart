@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:e_track/utils/global.dart';
+import 'package:e_track/utils/socket_connection.dart';
 import 'package:e_track/utils/storagebox.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
@@ -11,6 +11,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+
 import 'strings.dart';
 
 Future<bool> handleLocationPermission(bool isSilent) async {
@@ -172,6 +173,15 @@ Future<void> getLocation(
   if (position != null) {
     body = "last synced at ${DateFormat("hh:mm a").format(DateTime.now())}";
     kPrintLog('FLUTTER BACKGROUND SERVICE: ${DateTime.now()}');
+
+    /*try {
+      SocketConnection socket = SocketConnection.instance;
+      await socket.connect('192.168.1.1', 3000); // Replace with your server's IP and port
+      socket.sendData('Hello, Server!');
+    } catch (e) {
+      kPrintLog(e);
+    }*/
+
     /*try {
       // API Call
       final response =
@@ -202,7 +212,9 @@ Future<void> getLocation(
   );
   await Future.delayed(const Duration(seconds: 30));
   // if (StorageBox.instance.getBackgroundFetchEnabled()) {
-  getLocation(flutterLocalNotificationsPlugin);
+  // if(await isLocationServiceRunning()) {
+    getLocation(flutterLocalNotificationsPlugin);
+  // }
   // }
 }
 
@@ -216,6 +228,7 @@ Future<void> stopLocationService() async {
   if (await isLocationServiceRunning()) {
     await StorageBox.instance.setBackgroundFetchEnable(false);
     FlutterBackgroundService().invoke("stopService");
+    // SocketConnection.instance.close();
   }
 }
 
@@ -226,19 +239,4 @@ Future<void> startLocationService() async {
     service.invoke("setAsForeground");
     service.startService();
   }
-}
-
-void retrieveLatLng() async {
-  final hasPermission = await handleLocationPermission(false);
-  if (!hasPermission) return;
-  LatLng? position = await getCurrentPosition();
-  kPrintLog("Sign In ${position?.latitude} ${position?.longitude}");
-  // call sign in API
-
-  if (await isLocationServiceRunning()) {
-    await stopLocationService();
-    return;
-  }
-
-  await startLocationService();
 }

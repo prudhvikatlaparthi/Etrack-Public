@@ -49,12 +49,7 @@ class AuthController extends GetxController {
               .setFullName("${authData.firstName} ${authData.lastName}");
           await StorageBox.instance.setProfilePic(authData.profileImage);
           await StorageBox.instance.setUserId(authData.userId);
-          if (authData.userType?.toLowerCase() == "Customer".toLowerCase()) {
-            await StorageBox.instance.setIsAdmin(true);
-          } else if (authData.userType?.toLowerCase() ==
-              "Employee".toLowerCase()) {
-            await StorageBox.instance.setIsAdmin(false);
-          }
+          await StorageBox.instance.setUserType(authData.userType);
           Get.off(() => HomeScreen());
           Get.delete<AuthController>();
         } else {

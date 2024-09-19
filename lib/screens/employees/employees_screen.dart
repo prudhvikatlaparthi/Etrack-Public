@@ -83,7 +83,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                     Employee employee = controller.dateUsers[index];
                     return ListTile(
                       onTap: () {
-                        navigateToCreation(shareUserId: employee.userId);
+                        navigateToCreation(employeeId: employee.employeeId);
                       },
                       title: Text("${employee.firstName} ${employee.lastName}"),
                       subtitle: Column(
@@ -109,10 +109,10 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
     );
   }
 
-  void navigateToCreation({String? shareUserId}) {
+  void navigateToCreation({String? employeeId}) {
     Get.delete<AddEmployeeController>();
     Get.to(() => AddEmployeeScreen(
-          shareUserId: shareUserId,
+          employeeId: employeeId,
         ))?.then((value) {
       if (value != null) {
         controller.fetchUsers();

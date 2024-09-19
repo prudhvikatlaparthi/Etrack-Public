@@ -4,8 +4,8 @@ part 'employee.g.dart';
 
 @JsonSerializable()
 class Employee {
-  @JsonKey(name: 'user_id')
-  final String? userId;
+  @JsonKey(name: 'employee_id')
+  final String? employeeId;
   @JsonKey(name: 'first_name')
   final String? firstName;
   @JsonKey(name: 'last_name')
@@ -15,7 +15,7 @@ class Employee {
   final String? nickName;
   final String? mobile;
   @JsonKey(name: 'profile_image')
-  final String? profileImage;
+  String? profileImage;
   @JsonKey(name: 'user_friend_id')
   final String? userFriendId;
   @JsonKey(name: 'friend_type')
@@ -70,7 +70,7 @@ class Employee {
   final String? countryId;
 
   Employee({
-    this.userId,
+    this.employeeId,
     this.firstName,
     this.lastName,
     this.email,

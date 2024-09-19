@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import '../../utils/debounce.dart';
 import '../../utils/storagebox.dart';
 import '../../utils/strings.dart';
-import '../common/loader.dart';
 
 class EmployeeController extends GetxController {
   
@@ -16,11 +15,6 @@ class EmployeeController extends GetxController {
   final searchEnable = false.obs;
   final apiData = <Employee>[];
   final Debounce _debounce = Debounce(const Duration(milliseconds: 400));
-
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   @override
   void onClose() {
@@ -51,7 +45,7 @@ class EmployeeController extends GetxController {
           .request('etrack/my_employees_list', DioMethod.get, param: {
         'user_id': StorageBox.instance.getUserId(),
         'device_token': StorageBox.instance.getDeviceID(),
-        'user_type': StorageBox.instance.isAdmin() ? "Customer" : "Employee",
+        'user_type': StorageBox.instance.getUserType(),
       });
       if (response.statusCode == 200) {
         if (response.data['status'] == true) {

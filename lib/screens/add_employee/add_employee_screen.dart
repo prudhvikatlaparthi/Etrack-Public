@@ -11,9 +11,9 @@ import 'package:image_picker/image_picker.dart';
 import '../common/mybutton.dart';
 
 class AddEmployeeScreen extends StatefulWidget {
-  final String? shareUserId;
+  final String? employeeId;
 
-  const AddEmployeeScreen({super.key, this.shareUserId});
+  const AddEmployeeScreen({super.key, this.employeeId});
 
   @override
   State<AddEmployeeScreen> createState() => _AddEmployeeScreenState();
@@ -26,8 +26,8 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await controller.fetchCountries();
-      if (widget.shareUserId.isNotNullOrEmpty) {
-        controller.getEmployeeDetails(widget.shareUserId!);
+      if (widget.employeeId.isNotNullOrEmpty) {
+        controller.getEmployeeDetails(widget.employeeId!);
       }
     });
     super.initState();
@@ -38,7 +38,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.shareUserId.isNotNullOrEmpty ? "Update Employee" : "Add Employee",
+          widget.employeeId.isNotNullOrEmpty ? "Update Employee" : "Add Employee",
           style: const TextStyle(
               fontSize: 18, fontWeight: FontWeight.bold, color: colorBlack),
         ),
@@ -69,6 +69,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                                     .pickImage(source: ImageSource.camera);
                                 Get.back();
                                 if(photo?.path == null) return;
+                                controller.selectedEmployee.value?.profileImage = null;
                                 controller.profilePic.value = photo;
                               },
                               child: Text('Camera')),
@@ -86,6 +87,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                                     .pickImage(source: ImageSource.gallery);
                                 Get.back();
                                 if(photo?.path == null) return;
+                                controller.selectedEmployee.value?.profileImage = null;
                                 controller.profilePic.value = photo;
                               },
                               child: Text('Gallery')),

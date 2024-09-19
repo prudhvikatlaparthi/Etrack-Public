@@ -9,10 +9,25 @@ import '../../utils/storagebox.dart';
 import '../common/app_drawer.dart';
 import '../common/swipesview.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final controller = Get.put(HomeController());
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.checkSync();
+      // controller.callDate();
+      controller.initPackageInfo();
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,11 +131,15 @@ class HomeScreen extends StatelessWidget {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  MyButton(
-                                      label: "Sign In",
-                                      onPress: () {
-                                        retrieveLatLng();
-                                      })
+                                  Obx(
+                                    () => MyButton(
+                                        label: controller.isSignedIn.value
+                                            ? "Sign out"
+                                            : "Sign In",
+                                        onPress: () {
+                                          controller.retrieveLatLng();
+                                        }),
+                                  )
                                 ],
                               )
                             ]))),

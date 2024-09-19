@@ -32,12 +32,12 @@ class StorageBox {
     return _box.read("Password") ?? '';
   }
 
-  setIsAdmin(bool value) async {
-    await _box.write("IsAdmin", value);
+  setUserType(String? value) async {
+    await _box.write("UserType", value);
   }
 
-  bool isAdmin() {
-    return _box.read("IsAdmin") ?? false;
+  String getUserType() {
+    return _box.read("UserType") ?? '';
   }
 
   setDeviceID(String? value) async {
