@@ -1,7 +1,7 @@
 class Date {
-  final time;
-  final day;
-  final date;
+  String time;
+  String day;
+  String date;
 
-  Date({this.time, this.day, this.date});
+  Date({required this.time, required this.day, required this.date});
 }

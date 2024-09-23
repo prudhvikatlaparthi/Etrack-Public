@@ -100,7 +100,7 @@ Future<void> initializeService() async {
       initialNotificationTitle: notificationTitle,
       initialNotificationContent: 'Initializing',
       foregroundServiceNotificationId: channelID,
-      foregroundServiceType: AndroidForegroundType.location,
+      foregroundServiceTypes: [AndroidForegroundType.location],
     ),
     iosConfiguration: IosConfiguration(
       // auto start service
@@ -207,6 +207,10 @@ Future<void> getLocation(
         notificationTitle,
         icon: notificationIconName,
         ongoing: true,
+        playSound: false,
+        enableVibration: false,
+        enableLights: false,
+
       ),
     ),
   );

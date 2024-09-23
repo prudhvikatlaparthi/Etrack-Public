@@ -8,7 +8,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../utils/location_service.dart';
 
 class HomeController extends GetxController {
-  final Rx<Date> _date = Rx<Date>(Date());
+  final Rx<Date> _date = Rx<Date>(Date(time: '', day: '', date: ''));
   final Rx<PackageInfo> _info = Rx<PackageInfo>(PackageInfo(
       appName: '',
       packageName: '',
@@ -30,10 +30,14 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
+  var clockTimer = 60 - DateTime.now().second;
+
   void callDate() {
     final date = getDate();
     _date.value = date;
-    Future.delayed(const Duration(seconds: 1), () {
+    kPrintLog(clockTimer);
+    Future.delayed(Duration(seconds: clockTimer), () {
+      clockTimer = 60;
       callDate();
     });
   }
@@ -65,6 +69,5 @@ class HomeController extends GetxController {
     await startLocationService();
   }
 
-  void signInOut() {
-  }
+  void signInOut() {}
 }
