@@ -240,7 +240,7 @@ Future<void> startLocationService() async {
   if (!await isLocationServiceRunning()) {
     await StorageBox.instance.setBackgroundFetchEnable(true);
     var service = FlutterBackgroundService();
-    service.invoke("setAsForeground");
+    service.invoke("setAsBackground");
     service.startService();
   }
 }

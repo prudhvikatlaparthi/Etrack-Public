@@ -20,11 +20,11 @@ public class BootReceiver extends BroadcastReceiver {
                     BackgroundService.getLock(context).acquire();
                 }
 
-                if (config.isForeground()) {
+                /*if (config.isForeground()) {
                     ContextCompat.startForegroundService(context, new Intent(context, BackgroundService.class));
                 } else {
-                    context.startService(new Intent(context, BackgroundService.class));
-                }
+                }*/
+                context.startService(new Intent(context, BackgroundService.class));
             }
         }
     }
