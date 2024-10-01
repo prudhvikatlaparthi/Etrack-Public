@@ -8,7 +8,9 @@ import '../common/swipesview.dart';
 import 'employee_track_controller.dart';
 
 class EmployeeTrackScreen extends StatefulWidget {
-  const EmployeeTrackScreen({super.key});
+  final String employeeId;
+
+  const EmployeeTrackScreen({super.key, required this.employeeId});
 
   @override
   State<EmployeeTrackScreen> createState() => _EmployeeTrackScreenState();
@@ -16,6 +18,14 @@ class EmployeeTrackScreen extends StatefulWidget {
 
 class _EmployeeTrackScreenState extends State<EmployeeTrackScreen> {
   final controller = Get.put(EmployeeTrackController());
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.getAttendanceDetails(widget.employeeId);
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,50 +43,20 @@ class _EmployeeTrackScreenState extends State<EmployeeTrackScreen> {
         child: SingleChildScrollView(
             child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(),
-                const Text(
-                  "Select Date:",
-                  style:
-                      TextStyle(fontWeight: FontWeight.w600, color: colorBlack),
-                ),
-                const Spacer(),
-                TextButton(
-                  onPressed: () {
-                    _selectDate(context);
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Obx(
-                      ()=> Text(
-                          DateFormat("dd-MMM-yyyy").format(controller.date.value),
-                          style: const TextStyle(color: colorBlack),
-                        ),
-                      ),
-                      SizedBox(width: 8,),
-                      const Icon(Icons.calendar_month)
-                    ],
-                  ),
-                ),
-                const Spacer(),
-              ],
-            ),
-
-            SizedBox(height: 10,),
             Container(
               width: double.infinity,
               height: 300,
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: GoogleMap(initialCameraPosition: controller.googlePlex)),
+                  child: Obx(() => GoogleMap(
+                      initialCameraPosition: controller.googlePlex.value))),
             ),
             const SizedBox(
               height: 20,
             ),
-            swipesView(inTime: '10:00', outTime: '07:30'),
+            Obx(() => swipesView(
+                inTime: controller.inOutDetails.value.checkInTime ?? '',
+                outTime: controller.inOutDetails.value.checkOutTime ?? '')),
           ],
         )),
       )),
@@ -84,14 +64,5 @@ class _EmployeeTrackScreenState extends State<EmployeeTrackScreen> {
     );
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: controller.date.value,
-        firstDate: DateTime(2024, 1),
-        lastDate: controller.date.value);
-    if (picked != null && picked != controller.date.value) {
-      controller.date.value = picked;
-    }
-  }
+
 }

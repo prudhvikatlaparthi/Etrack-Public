@@ -14,7 +14,7 @@ class ApiService {
       return 'https://api.pragatiutrack.com/api/';
     }
 
-    return 'production url';
+    return 'https://api.pragatiutrack.com/api/';
   }
 
   Future<Response> request(

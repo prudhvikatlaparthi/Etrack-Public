@@ -1,20 +1,21 @@
-import 'package:e_track/models/employee.dart';
+import 'package:e_track/models/employee_attendance.dart';
 import 'package:e_track/network/api_service.dart';
 import 'package:e_track/utils/global.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../../utils/debounce.dart';
 import '../../utils/storagebox.dart';
 import '../../utils/strings.dart';
 
-class EmployeeController extends GetxController {
-  
+class EmployeeAttendanceController extends GetxController {
   final TextEditingController searchTextController = TextEditingController();
-  final dateUsers = RxList<Employee>([]);
+  final dateUsers = RxList<EmployeeAttendance>([]);
   final searchEnable = false.obs;
-  final apiData = <Employee>[];
+  final apiData = <EmployeeAttendance>[];
   final Debounce _debounce = Debounce(const Duration(milliseconds: 400));
+  final Rx<DateTime> date = Rx<DateTime>(DateTime.now());
 
   @override
   void onClose() {
@@ -30,44 +31,54 @@ class EmployeeController extends GetxController {
       } else {
         final data = apiData
             .where((d) =>
-                (d.email ?? '').toLowerCase().contains(searchTextController.text.toLowerCase()) ||
-                (d.userName ?? '').toLowerCase().contains(searchTextController.text.toLowerCase()) ||
-                (d.mobile ?? '').toLowerCase().contains(searchTextController.text.toLowerCase()) ||
-                (d.firstName ?? '').toLowerCase().contains(searchTextController.text.toLowerCase()) ||
-                (d.lastName ?? '').toLowerCase().contains(searchTextController.text.toLowerCase()))
+                (d.userName ?? '')
+                    .toLowerCase()
+                    .contains(searchTextController.text.toLowerCase()) ||
+                (d.firstName ?? '')
+                    .toLowerCase()
+                    .contains(searchTextController.text.toLowerCase()) ||
+                (d.lastName ?? '')
+                    .toLowerCase()
+                    .contains(searchTextController.text.toLowerCase()))
             .toList();
         dateUsers.value = data;
       }
     });
   }
 
-  Future<void> fetchUsers() async {
+  Future<void> fetchEmployeeAttendance() async {
     try {
       showLoader();
       final response = await ApiService.instance
-          .request('etrack/my_employees_list', DioMethod.get, param: {
+          .request('etrack/employee_attendance', DioMethod.get, param: {
         'user_id': StorageBox.instance.getUserId(),
         'device_token': StorageBox.instance.getDeviceID(),
         'user_type': StorageBox.instance.getUserType(),
+        'attendance_date': DateFormat("yyyy-MM-dd").format(date.value),
       });
       dismissLoader();
       if (response.statusCode == 200) {
         if (response.data['status'] == true) {
-          final List<Employee> employees = response.data['data']
-              .map<Employee>((e) => Employee.fromJson(e))
+          final List<EmployeeAttendance> employees = response.data['data']
+              .map<EmployeeAttendance>((e) => EmployeeAttendance.fromJson(e))
               .toList();
           dateUsers.value = employees;
           apiData.clear();
           apiData.addAll(employees);
-
         } else {
           showToast(message: response.data['message']);
+          dateUsers.value = [];
+          apiData.clear();
         }
       } else {
         showToast(message: response.statusMessage ?? networkErrorMsg);
+        dateUsers.value = [];
+        apiData.clear();
       }
     } catch (e) {
       dismissLoader();
+      dateUsers.value = [];
+      apiData.clear();
       showToast(message: e.toString());
     }
   }

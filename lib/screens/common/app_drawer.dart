@@ -1,6 +1,6 @@
 import 'package:e_track/screens/change_password/change_password_screen.dart';
-import 'package:e_track/screens/employees/employee_controller.dart';
-import 'package:e_track/screens/employees/employees_screen.dart';
+import 'package:e_track/screens/employees_attendance/employee_attendance_controller.dart';
+import 'package:e_track/screens/employees_attendance/employees_attendance_screen.dart';
 import 'package:e_track/screens/home/homecontroller.dart';
 import 'package:e_track/utils/colors.dart';
 import 'package:e_track/utils/storagebox.dart';
@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../utils/global.dart';
+import '../employees/employee_controller.dart';
+import '../employees/employees_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({
@@ -75,7 +77,7 @@ class AppDrawer extends StatelessWidget {
             isAdmin()
                 ? ListTile(
                     title: const Text(
-                      'Employees',
+                      'My Employees',
                       style: TextStyle(color: colorBlack, fontSize: 16),
                     ),
                     onTap: () async {
@@ -87,6 +89,22 @@ class AppDrawer extends StatelessWidget {
                       });
                     },
                   )
+                : const SizedBox(),
+            isAdmin()
+                ? ListTile(
+              title: const Text(
+                'E Attendance',
+                style: TextStyle(color: colorBlack, fontSize: 16),
+              ),
+              onTap: () async {
+                Get.back();
+                await Future.delayed(const Duration(milliseconds: 400),
+                        () {
+                      Get.delete<EmployeeAttendanceController>();
+                      Get.to(() => const EmployeesAttendanceScreen());
+                    });
+              },
+            )
                 : const SizedBox(),
             ListTile(
               title: const Text(

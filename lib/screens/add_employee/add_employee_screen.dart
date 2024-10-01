@@ -135,6 +135,13 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                 height: 10,
               ),
               EditText(
+                label: "Nickname",
+                controller: controller.nickNameController,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              EditText(
                 label: "Email",
                 keyboardType: TextInputType.emailAddress,
                 controller: controller.emailController,

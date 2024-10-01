@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../add_employee/add_employee_controller.dart';
-import '../employee_tracking/employee_track_screen.dart';
+import '../common/populate_row_item.dart';
 
 class EmployeesScreen extends StatefulWidget {
   const EmployeesScreen({super.key});
@@ -64,7 +64,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                     child: Card(
                         elevation: 5,
                         child: EditText(
-                            hint: "Type here to search",
+                            hint: "Type here to search (Username, Name, Email, Mobile)",
                             onChange: (value) {
                               controller.onChangeListener();
                             },
@@ -81,23 +81,44 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                   itemCount: controller.dateUsers.length,
                   itemBuilder: (context, index) {
                     Employee employee = controller.dateUsers[index];
-                    return ListTile(
-                      onTap: () {
-                        navigateToCreation(employeeId: employee.employeeId);
-                      },
-                      title: Text("${employee.firstName} ${employee.lastName}"),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(employee.email ?? ''),
-                          Text(employee.mobile ?? ''),
-                        ],
+                    return Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8.0, right: 8.0, top: 1.0),
+                      child: InkWell(
+                        onTap: () {
+                          navigateToCreation(employeeId: employee.employeeId);
+                        },
+                        child: Card(
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 10,
+                              ),
+                              PopulateRowItem(
+                                label: 'Username:',
+                                value:
+                                employee.userName,
+                              ),
+                              PopulateRowItem(
+                                label: 'Name:',
+                                value:
+                                    "${employee.firstName} ${employee.lastName}",
+                              ),
+                              PopulateRowItem(
+                                label: 'Email:',
+                                value: employee.email,
+                              ),
+                              PopulateRowItem(
+                                label: 'Mobile:',
+                                value: employee.mobile,
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      trailing: TextButton(
-                          onPressed: () {
-                            Get.to(() => const EmployeeTrackScreen());
-                          },
-                          child: const Text("Track")),
                     );
                   },
                 ),
