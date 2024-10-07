@@ -22,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.initPackageInfo();
       if (StorageBox.instance.getUserId().isNotNullOrEmpty) {
         controller.autoLogin();
       }
@@ -112,7 +113,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       FocusManager.instance.primaryFocus?.unfocus();
                       controller.doLogin();
                     },
-                  )
+                  ),
+                  const SizedBox(height: 30,),
+                  Obx(
+                    () => Text(
+                      controller.version.value,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w200,
+                          fontSize: 12,
+                          color: colorPrimaryDark),
+                    ),
+                  ),
                 ],
               ),
             ),

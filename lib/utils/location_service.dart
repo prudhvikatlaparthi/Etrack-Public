@@ -5,7 +5,6 @@ import 'package:e_track/utils/socket_connection.dart';
 import 'package:e_track/utils/storagebox.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -65,10 +64,14 @@ Future<void> initializeService() async {
 
   /// OPTIONAL, using custom notification channel id
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    appName, // id
-    notificationTitle, // title
-    importance: Importance.high, // importance must be at low or higher level
-  );
+      appName, // id
+      notificationTitle, // title
+      importance: Importance.high,
+      // importance must be at low or higher level
+      playSound: false,
+      sound: null,
+      enableLights: false,
+      enableVibration: false);
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -100,7 +103,10 @@ Future<void> initializeService() async {
       initialNotificationTitle: notificationTitle,
       initialNotificationContent: 'Initializing',
       foregroundServiceNotificationId: channelID,
-      foregroundServiceTypes: [AndroidForegroundType.location],
+      foregroundServiceTypes: [
+        AndroidForegroundType.location,
+        AndroidForegroundType.dataSync
+      ],
     ),
     iosConfiguration: IosConfiguration(
       // auto start service
@@ -168,58 +174,48 @@ void onStart(ServiceInstance service) async {
 
 Future<void> getLocation(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
-  LatLng? position = await getCurrentPosition();
-  String body = "";
-  if (position != null) {
-    body = "last synced at ${DateFormat("hh:mm a").format(DateTime.now())}";
-    kPrintLog('FLUTTER BACKGROUND SERVICE: ${DateTime.now()}');
+  while (!StorageBox.instance.isStopSync()) {
+    LatLng? position = await getCurrentPosition();
+    String body = "";
+    final dateTime = DateTime.now();
+    if (position != null && StorageBox.instance.getImei().isNotNullOrEmpty) {
+      body = "last synced at ${DateFormat("hh:mm a").format(dateTime)}";
+      kPrintLog('FLUTTER BACKGROUND SERVICE: $dateTime');
+      try {
+        SocketConnection socket = SocketConnection.instance;
+        await socket.connect('13.235.142.155', 4307);
+        socket.sendData(
+            '${StorageBox.instance.getImei()},${DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime.toUtc())},${position.latitude},${position.longitude},0,0,5,1,50');
+      } catch (e) {
+        kPrintLog(e);
+        body = "${e.toString()} $dateTime";
+      }
+    } else {
+      body = "Problem occurred, please check mobile GPS";
+      kPrintLog('FLUTTER BACKGROUND SERVICE Error: $dateTime');
+    }
 
-    /*try {
-      SocketConnection socket = SocketConnection.instance;
-      await socket.connect('192.168.1.1', 3000); // Replace with your server's IP and port
-      socket.sendData('Hello, Server!');
-    } catch (e) {
-      kPrintLog(e);
-    }*/
-
-    /*try {
-      // API Call
-      final response =
-          await ApiService.instance.request('/users', DioMethod.get);
-      final List<UserResponse> users = response.data
-          .map<UserResponse>((e) => UserResponse.fromJson(e))
-          .toList();
-
-    } catch (e) {
-    }*/
-  } else {
-    body = "Problem occurred, please check mobile GPS";
-    kPrintLog('FLUTTER BACKGROUND SERVICE Error: ${DateTime.now()}');
-  }
-
-  flutterLocalNotificationsPlugin.show(
-    channelID,
-    notificationTitle,
-    body,
-    const NotificationDetails(
-      android: AndroidNotificationDetails(
-        appName,
-        notificationTitle,
-        icon: notificationIconName,
-        ongoing: true,
-        playSound: false,
-        enableVibration: false,
-        enableLights: false,
-
+    flutterLocalNotificationsPlugin.show(
+      channelID,
+      notificationTitle,
+      body,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          appName,
+          notificationTitle,
+          icon: notificationIconName,
+          ongoing: true,
+          playSound: false,
+          enableVibration: false,
+          enableLights: false,
+          sound: null,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
       ),
-    ),
-  );
-  await Future.delayed(const Duration(seconds: 30));
-  // if (StorageBox.instance.getBackgroundFetchEnabled()) {
-  // if(await isLocationServiceRunning()) {
-    getLocation(flutterLocalNotificationsPlugin);
-  // }
-  // }
+    );
+    await Future.delayed(const Duration(seconds: 30));
+  }
 }
 
 Future<bool> isLocationServiceRunning() async {
@@ -230,17 +226,17 @@ Future<bool> isLocationServiceRunning() async {
 
 Future<void> stopLocationService() async {
   if (await isLocationServiceRunning()) {
-    await StorageBox.instance.setBackgroundFetchEnable(false);
+    await StorageBox.instance.setStopSync(true);
     FlutterBackgroundService().invoke("stopService");
-    // SocketConnection.instance.close();
+    SocketConnection.instance.close();
   }
 }
 
 Future<void> startLocationService() async {
   if (!await isLocationServiceRunning()) {
-    await StorageBox.instance.setBackgroundFetchEnable(true);
+    await StorageBox.instance.setStopSync(false);
     var service = FlutterBackgroundService();
-    service.invoke("setAsBackground");
+    service.invoke("setAsForeground");
     service.startService();
   }
 }

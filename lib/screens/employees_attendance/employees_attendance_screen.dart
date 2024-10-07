@@ -1,6 +1,8 @@
 import 'package:e_track/screens/common/edittext.dart';
+import 'package:e_track/screens/employee_tracking/employee_track_controller.dart';
 import 'package:e_track/screens/employees_attendance/employee_attendance_controller.dart';
 import 'package:e_track/utils/colors.dart';
+import 'package:e_track/utils/global.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -81,7 +83,8 @@ class _EmployeesAttendanceScreenState extends State<EmployeesAttendanceScreen> {
                   itemBuilder: (context, index) {
                     EmployeeAttendance employee = controller.dateUsers[index];
                     return Padding(
-                      padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 1.0),
+                      padding: const EdgeInsets.only(
+                          left: 8.0, right: 8.0, top: 1.0),
                       child: Card(
                         child: Row(
                           children: [
@@ -97,11 +100,12 @@ class _EmployeesAttendanceScreenState extends State<EmployeesAttendanceScreen> {
                                   ),
                                   PopulateRowItem(
                                     label: 'Name:',
-                                    value: "${employee.firstName} ${employee.lastName}",
+                                    value:
+                                        "${employee.firstName} ${employee.lastName}",
                                   ),
                                   PopulateRowItem(
                                     label: 'Swipe In Time:',
-                                    value: employee.checkInTime,
+                                    value: formatDateTime(employee.checkInTime),
                                   ),
                                   PopulateRowItem(
                                     label: 'Swipe In Location:',
@@ -109,7 +113,8 @@ class _EmployeesAttendanceScreenState extends State<EmployeesAttendanceScreen> {
                                   ),
                                   PopulateRowItem(
                                     label: 'Swipe Out Time:',
-                                    value: employee.checkOutTime,
+                                    value:
+                                        formatDateTime(employee.checkOutTime),
                                   ),
                                   PopulateRowItem(
                                     label: 'Swipe Out Location:',
@@ -127,9 +132,15 @@ class _EmployeesAttendanceScreenState extends State<EmployeesAttendanceScreen> {
                             ),
                             TextButton(
                                 onPressed: () {
+                                  Get.delete<EmployeeTrackController>();
                                   Get.to(() => EmployeeTrackScreen(
-                                    employeeId: employee.employeeId!,
-                                  ));
+                                        employeeId: employee.employeeId!,
+                                        deviceLinkId:
+                                            employee.deviceInfo?.deviceLinkId ??
+                                                '',
+                                        swipeInTime: employee.checkInTime!,
+                                        swipeOutTime: employee.checkOutTime,
+                                      ));
                                 },
                                 child: const Text("Track")),
                           ],

@@ -1,3 +1,4 @@
+import 'package:e_track/models/device_info.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'employee_attendance.g.dart';
@@ -39,6 +40,8 @@ class EmployeeAttendance {
   final String? createdAt;
   @JsonKey(name: 'updated_at')
   final String? updatedAt;
+  @JsonKey(name: 'device_info')
+  final DeviceInfo? deviceInfo;
 
   EmployeeAttendance({
     this.employeeId,
@@ -59,6 +62,7 @@ class EmployeeAttendance {
     this.attendanceDate,
     this.createdAt,
     this.updatedAt,
+    this.deviceInfo,
   });
 
   factory EmployeeAttendance.fromJson(Map<String, dynamic> json) => _$EmployeeAttendanceFromJson(json);

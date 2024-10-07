@@ -51,7 +51,6 @@ class HomeController extends GetxController {
 
   Future<void> checkSync() async {
     bool sync = await isLocationServiceRunning();
-    await StorageBox.instance.setBackgroundFetchEnable(sync);
     isSyncing.value = sync;
   }
 
@@ -61,16 +60,13 @@ class HomeController extends GetxController {
     showLoader();
     LatLng? position = await getCurrentPosition();
     kPrintLog("Sign In ${position?.latitude} ${position?.longitude}");
-    // call sign in API
-    signInOut(position);
-
-    /*if (await isLocationServiceRunning()) {
+    if (inOutDetails.value.checkInTime?.isNotNullOrEmpty == true) {
       await stopLocationService();
-      await StorageBox.instance.setBackgroundFetchEnable(false);
-      return;
+      signInOut(position);
+    } else {
+      signInOut(position);
+      await startLocationService();
     }
-    await StorageBox.instance.setBackgroundFetchEnable(true);
-    await startLocationService();*/
   }
 
   Future<void> getAttendanceDetails() async {
@@ -89,7 +85,13 @@ class HomeController extends GetxController {
           final EmployeeAttendance empAtt =
               EmployeeAttendance.fromJson(response.data['data']);
           inOutDetails.value = empAtt;
-          kPrintLog(empAtt);
+          kPrintLog(empAtt.deviceInfo?.imei);
+          await StorageBox.instance.setImei(empAtt.deviceInfo?.imei);
+          if (empAtt.checkOutTime.isNullOrEmpty) {
+            if (!await isLocationServiceRunning()) {
+              startLocationService();
+            }
+          }
         } else {
           inOutDetails.value = EmployeeAttendance();
           // showToast(message: response.data['message']);

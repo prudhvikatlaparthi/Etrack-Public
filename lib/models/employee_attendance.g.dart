@@ -26,6 +26,9 @@ EmployeeAttendance _$EmployeeAttendanceFromJson(Map<String, dynamic> json) =>
       attendanceDate: json['attendance_date'] as String?,
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,
+      deviceInfo: json['device_info'] == null
+          ? null
+          : DeviceInfo.fromJson(json['device_info'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$EmployeeAttendanceToJson(EmployeeAttendance instance) =>
@@ -48,4 +51,5 @@ Map<String, dynamic> _$EmployeeAttendanceToJson(EmployeeAttendance instance) =>
       'attendance_date': instance.attendanceDate,
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
+      'device_info': instance.deviceInfo,
     };

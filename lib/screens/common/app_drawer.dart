@@ -41,7 +41,7 @@ class AppDrawer extends StatelessWidget {
                   Wrap(
                     alignment: WrapAlignment.center,
                     children: [
-                      Obx(() => Icon(
+                      /*Obx(() => Icon(
                             controller.isSyncing.value
                                 ? Icons.sync
                                 : Icons.sync_disabled,
@@ -50,7 +50,7 @@ class AppDrawer extends StatelessWidget {
                           )),
                       const SizedBox(
                         width: 10,
-                      ),
+                      ),*/
                       Text(
                         StorageBox.instance.getFullName(),
                         textAlign: TextAlign.center,

@@ -16,7 +16,7 @@ publish_to: 'none'
 
 
 
-version: 1.0.0+1
+version: 2.0.0+2
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -68,7 +68,7 @@ dependencies:
   email_validator: ^3.0.0
   analyzer: ^6.7.0
   image_picker: ^1.1.2
-  internet_connection_checker: ^2.0.0
+  internet_connection_checker: ^1.0.0+1
   http_parser: ^4.0.2
   logger: ^2.4.0
   app_settings: ^5.1.1

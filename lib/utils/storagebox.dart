@@ -48,12 +48,12 @@ class StorageBox {
     return _box.read("DEVICE_ID") ?? '';
   }
 
-  setBackgroundFetchEnable(bool value) async {
-    await _box.write("IsFetching", value);
+  setStopSync(bool value) async {
+    await _box.write("StopSync", value);
   }
 
-  bool getBackgroundFetchEnabled() {
-    return _box.read("IsFetching") ?? false;
+  bool isStopSync() {
+    return _box.read("StopSync") ?? false;
   }
 
   setProfilePic(String? value) async {
@@ -62,6 +62,14 @@ class StorageBox {
 
   String? getProfilePic() {
     return _box.read("ProfilePic");
+  }
+
+  setImei(String? value) async {
+    await _box.write("IMEI", value);
+  }
+
+  String? getImei() {
+    return _box.read("IMEI");
   }
 
   setUserId(String? value) async {

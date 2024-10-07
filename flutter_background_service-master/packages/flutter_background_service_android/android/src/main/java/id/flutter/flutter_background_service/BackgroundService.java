@@ -44,7 +44,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 
 public class BackgroundService extends Service implements MethodChannel.MethodCallHandler {
-    private static final String TAG = "BackgroundService1";
+    private static final String TAG = "BackgroundService";
     private static final String LOCK_NAME = BackgroundService.class.getName()
             + ".Lock";
     public static volatile WakeLock lockStatic = null; // notice static
@@ -146,6 +146,10 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
             int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(notificationChannelId, name, importance);
             channel.setDescription(description);
+            channel.enableLights(false);
+            channel.enableVibration(false);
+            channel.setSound(null,null);
+
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
@@ -167,6 +171,7 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
                     .setSmallIcon(R.drawable.ic_bg_service_small)
                     .setAutoCancel(true)
                     .setOngoing(true)
+                    .setSilent(true)
                     .setContentTitle(notificationTitle)
                     .setContentText(notificationContent)
                     .setContentIntent(pi);
@@ -190,7 +195,7 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
         WatchdogReceiver.enqueue(this);
         runService();
 
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @SuppressLint("WakelockTimeout")

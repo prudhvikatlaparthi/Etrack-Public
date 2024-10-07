@@ -34,7 +34,7 @@
 
         <service
             android:name="id.flutter.flutter_background_service.BackgroundService"
-            android:foregroundServiceType="location"
+            android:foregroundServiceType="location|dataSync"
             />
 
         <meta-data android:name="com.google.android.geo.API_KEY"

@@ -172,9 +172,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 20,
                     ),
                     Obx(() => swipesView(
-                        inTime: controller.inOutDetails.value.checkInTime ?? '',
+                        inTime: formatDateTime(controller.inOutDetails.value.checkInTime),
                         outTime:
-                            controller.inOutDetails.value.checkOutTime ?? '')),
+                        formatDateTime(controller.inOutDetails.value.checkOutTime))),
                   ],
                 )))));
   }

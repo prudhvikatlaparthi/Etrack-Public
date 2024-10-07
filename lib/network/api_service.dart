@@ -77,6 +77,7 @@ class ApiService {
           return res;
       }
     } catch (e) {
+      kPrintLog(e);
       throw Exception(e.toString());
     }
   }

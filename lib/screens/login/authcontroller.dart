@@ -3,6 +3,7 @@ import 'package:e_track/utils/encryption.dart';
 import 'package:e_track/utils/storagebox.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../network/api_service.dart';
 import '../../utils/global.dart';
@@ -12,6 +13,7 @@ import '../home/home_screen.dart';
 class AuthController extends GetxController {
   final emailTextController = TextEditingController(text: '');
   final passwordTextController = TextEditingController(text: "");
+  final version = 'App Version:'.obs;
 
   void doLogin() async {
     final email = emailTextController.text;
@@ -50,6 +52,7 @@ class AuthController extends GetxController {
           await StorageBox.instance.setProfilePic(authData.profileImage);
           await StorageBox.instance.setUserId(authData.userId);
           await StorageBox.instance.setUserType(authData.userType);
+          await StorageBox.instance.setStopSync(false);
           Get.off(() => HomeScreen());
           Get.delete<AuthController>();
         } else {
@@ -70,5 +73,10 @@ class AuthController extends GetxController {
     emailTextController.text = username;
     passwordTextController.text = aesDecrypt(password) ?? '';
     authenticate(username, password);
+  }
+
+  Future<void> initPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    version.value =  'App Version: ${info.version}';
   }
 }
