@@ -185,14 +185,21 @@ Future<void> getLocation(
         SocketConnection socket = SocketConnection.instance;
         await socket.connect('13.235.142.155', 4307);
         socket.sendData(
-            '${StorageBox.instance.getImei()},${DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime.toUtc())},${position.latitude},${position.longitude},0,0,5,1,50');
+            '${StorageBox.instance.getImei()},${DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime.toUtc())},${position.latitude},${position.longitude},0,0,5,1,50',
+            (message) {
+          body = message;
+        });
       } catch (e) {
         kPrintLog(e);
-        body = "${e.toString()} $dateTime";
+        body = "Problem occurred, please check Socket";
       }
     } else {
-      body = "Problem occurred, please check mobile GPS";
-      kPrintLog('FLUTTER BACKGROUND SERVICE Error: $dateTime');
+      if (position == null) {
+        body = "Problem occurred, please check mobile GPS";
+      } else if (StorageBox.instance.getImei().isNullOrEmpty) {
+        body = "Problem occurred, please check IMEI";
+      }
+      kPrintLog('FLUTTER BACKGROUND SERVICE Error: $body $dateTime');
     }
 
     flutterLocalNotificationsPlugin.show(
