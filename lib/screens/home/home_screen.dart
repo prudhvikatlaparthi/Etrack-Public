@@ -1,10 +1,10 @@
 import 'package:e_track/screens/common/mybutton.dart';
 import 'package:e_track/screens/home/homecontroller.dart';
 import 'package:e_track/utils/colors.dart';
+import 'package:e_track/utils/global.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../utils/location_service.dart';
 import '../../utils/storagebox.dart';
 import '../common/app_drawer.dart';
 import '../common/swipesview.dart';
@@ -25,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
       controller.checkSync();
       // controller.callDate();
       controller.initPackageInfo();
+      controller.getAttendanceDetails();
     });
     super.initState();
   }
@@ -133,10 +134,34 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   Obx(
                                     () => MyButton(
-                                        label: controller.isSignedIn.value
-                                            ? "Sign out"
-                                            : "Sign In",
+                                        disableButton: controller
+                                                    .inOutDetails
+                                                    .value
+                                                    .checkInTime
+                                                    ?.isNotNullOrEmpty ==
+                                                true &&
+                                            controller
+                                                    .inOutDetails
+                                                    .value
+                                                    .checkOutTime
+                                                    ?.isNotNullOrEmpty ==
+                                                true,
+                                        label: getButtonText(),
                                         onPress: () {
+                                          if (controller
+                                                      .inOutDetails
+                                                      .value
+                                                      .checkInTime
+                                                      ?.isNotNullOrEmpty ==
+                                                  true &&
+                                              controller
+                                                      .inOutDetails
+                                                      .value
+                                                      .checkOutTime
+                                                      ?.isNotNullOrEmpty ==
+                                                  true) {
+                                            return;
+                                          }
                                           controller.retrieveLatLng();
                                         }),
                                   )
@@ -146,8 +171,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    swipesView(inTime: '10:00', outTime: '07:30'),
+                    Obx(() => swipesView(
+                        inTime: formatDateTime(controller.inOutDetails.value.checkInTime),
+                        outTime:
+                        formatDateTime(controller.inOutDetails.value.checkOutTime))),
                   ],
                 )))));
+  }
+
+  String getButtonText() {
+    if (controller.inOutDetails.value.checkInTime?.isNotNullOrEmpty == true &&
+        controller.inOutDetails.value.checkOutTime?.isNotNullOrEmpty == true) {
+      return "Sign In";
+    }
+    return controller.inOutDetails.value.checkInTime?.isNullOrEmpty ?? true == true
+        ? "Sign In"
+        : "Sign Out";
   }
 }

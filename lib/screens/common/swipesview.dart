@@ -26,7 +26,7 @@ Widget swipesView({required String inTime, required String outTime}) {
             style: TextStyle(color: colorBlack),
           ),
           SizedBox(
-            width: Get.width * 0.24,
+            width: Get.width * 0.15,
           ),
           Text(
             inTime,
@@ -49,7 +49,7 @@ Widget swipesView({required String inTime, required String outTime}) {
             style: TextStyle(color: colorBlack),
           ),
           SizedBox(
-            width: Get.width * 0.2,
+            width: Get.width * 0.15,
           ),
           Text(outTime,
               style: TextStyle(fontWeight: FontWeight.w600, color: colorBlack)),

@@ -8,7 +8,7 @@ class StorageBox {
 
   final _box = GetStorage();
 
-  setFullName(String? value) async {
+  Future<void> setFullName(String? value) async {
     await _box.write("FullName", value);
   }
 
@@ -16,7 +16,7 @@ class StorageBox {
     return _box.read("FullName") ?? '';
   }
 
-  setUsername(String value) async {
+  Future<void> setUsername(String value) async {
     await _box.write("Username", aesEncrypt(value));
   }
 
@@ -24,7 +24,7 @@ class StorageBox {
     return aesDecrypt(_box.read("Username")) ?? '';
   }
 
-  setPassword(String value) async {
+  Future<void> setPassword(String value) async {
     await _box.write("Password", value);
   }
 
@@ -32,7 +32,7 @@ class StorageBox {
     return _box.read("Password") ?? '';
   }
 
-  setUserType(String? value) async {
+  Future<void> setUserType(String? value) async {
     await _box.write("UserType", value);
   }
 
@@ -40,7 +40,7 @@ class StorageBox {
     return _box.read("UserType") ?? '';
   }
 
-  setDeviceID(String? value) async {
+  Future<void> setDeviceID(String? value) async {
     await _box.write("DEVICE_ID", value);
   }
 
@@ -48,15 +48,15 @@ class StorageBox {
     return _box.read("DEVICE_ID") ?? '';
   }
 
-  setBackgroundFetchEnable(bool value) async {
-    await _box.write("IsFetching", value);
+  Future<void> setStopSync(bool value) async {
+    await _box.write("StopSync", value);
   }
 
-  bool getBackgroundFetchEnabled() {
-    return _box.read("IsFetching") ?? false;
+  bool isStopSync() {
+    return _box.read("StopSync") ?? false;
   }
 
-  setProfilePic(String? value) async {
+  Future<void> setProfilePic(String? value) async {
     await _box.write("ProfilePic", value);
   }
 
@@ -64,7 +64,15 @@ class StorageBox {
     return _box.read("ProfilePic");
   }
 
-  setUserId(String? value) async {
+  Future<void> setImei(String? value) async {
+    await _box.write("IMEI", value);
+  }
+
+  String? getImei() {
+    return _box.read("IMEI");
+  }
+
+  Future<void> setUserId(String? value) async {
     await _box.write("UserId", value);
   }
 
@@ -72,7 +80,15 @@ class StorageBox {
     return _box.read("UserId");
   }
 
-  clear() async {
+  Future<void> clear() async {
     await _box.erase();
+  }
+
+  Future<void> setIsLaunched(bool value) async {
+    await _box.write("IsLaunched", value);
+  }
+
+  bool isLaunched() {
+    return _box.read("IsLaunched") ?? false;
   }
 }

@@ -31,7 +31,10 @@ class EmployeeController extends GetxController {
         final data = apiData
             .where((d) =>
                 (d.email ?? '').toLowerCase().contains(searchTextController.text.toLowerCase()) ||
-                (d.firstName ?? '').toLowerCase().contains(searchTextController.text.toLowerCase()))
+                (d.userName ?? '').toLowerCase().contains(searchTextController.text.toLowerCase()) ||
+                (d.mobile ?? '').toLowerCase().contains(searchTextController.text.toLowerCase()) ||
+                (d.firstName ?? '').toLowerCase().contains(searchTextController.text.toLowerCase()) ||
+                (d.lastName ?? '').toLowerCase().contains(searchTextController.text.toLowerCase()))
             .toList();
         dateUsers.value = data;
       }
@@ -47,12 +50,12 @@ class EmployeeController extends GetxController {
         'device_token': StorageBox.instance.getDeviceID(),
         'user_type': StorageBox.instance.getUserType(),
       });
+      dismissLoader();
       if (response.statusCode == 200) {
         if (response.data['status'] == true) {
           final List<Employee> employees = response.data['data']
               .map<Employee>((e) => Employee.fromJson(e))
               .toList();
-          dismissLoader();
           dateUsers.value = employees;
           apiData.clear();
           apiData.addAll(employees);

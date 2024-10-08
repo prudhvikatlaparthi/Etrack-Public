@@ -45,6 +45,7 @@ Employee _$EmployeeFromJson(Map<String, dynamic> json) => Employee(
       city: json['city'] as String?,
       deviceList: json['device_list'] as List<dynamic>?,
       countryId: json['country_id'] as String?,
+      userName: json['user_name'] as String?,
     );
 
 Map<String, dynamic> _$EmployeeToJson(Employee instance) => <String, dynamic>{
@@ -86,4 +87,5 @@ Map<String, dynamic> _$EmployeeToJson(Employee instance) => <String, dynamic>{
       'city': instance.city,
       'device_list': instance.deviceList,
       'country_id': instance.countryId,
+      'user_name': instance.userName,
     };

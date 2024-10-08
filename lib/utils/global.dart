@@ -30,6 +30,13 @@ Date getDate() {
   return Date(time: time, date: formattedDate, day: dayOfWeek);
 }
 
+String formatDateTime(String? dateTimeString) {
+  if(dateTimeString.isNullOrEmpty) return "";
+  DateTime dateTime = DateTime.parse(dateTimeString!);
+  String formattedDate = DateFormat('d MMM yyyy hh:mm a').format(dateTime);
+  return formattedDate;
+}
+
 String getTime(DateTime? date) {
   if (date == null) return "";
   return DateFormat("hh:mm a").format(date);
@@ -40,8 +47,7 @@ Future<void> logOut() async {
   String deviceId = StorageBox.instance.getDeviceID();
   await StorageBox.instance.clear();
   await StorageBox.instance.setDeviceID(deviceId);
-  Get.back();
-  Get.off(() => LoginScreen());
+  Get.off(() => const LoginScreen());
 }
 
 extension StringExtensions on String? {

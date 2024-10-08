@@ -45,15 +45,17 @@ class SocketConnection {
   }
 
   // Method to send data
-  void sendData(String message) {
+  void sendData(String message, Function(String) callback) {
     try {
       if (_socket != null) {
         _socket!.write(message);
         kPrintLog('Sent: $message');
       } else {
-        kPrintLog('Socket is not connected');
+        kPrintLog('Problem occurred, please check Socket');
+        callback('Problem occurred, please check Socket');
       }
     } catch (e) {
+      callback("Problem occurred, please check Socket.");
       kPrintLog(e);
     }
   }

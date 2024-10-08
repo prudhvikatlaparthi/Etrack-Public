@@ -68,6 +68,8 @@ class Employee {
   final List<dynamic>? deviceList;
   @JsonKey(name: 'country_id')
   final String? countryId;
+  @JsonKey(name: 'user_name')
+  final String? userName;
 
   Employee({
     this.employeeId,
@@ -107,6 +109,7 @@ class Employee {
     this.city,
     this.deviceList,
     this.countryId,
+    this.userName,
   });
 
   factory Employee.fromJson(Map<String, dynamic> json) =>

@@ -1,14 +1,18 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:auto_start_flutter/auto_start_flutter.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
+import 'package:e_track/utils/global.dart';
 import 'package:e_track/utils/strings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'screens/login/login_screen.dart';
 import 'utils/colors.dart';
@@ -20,6 +24,10 @@ Future<void> main() async {
   await GetStorage.init();
   await initializeService();
   await handleLocationPermission(true);
+  final isNotification = await Permission.notification.status;
+  if (!isNotification.isGranted) {
+    await Permission.notification.request();
+  }
   if (Platform.isAndroid) {
     bool? notifyPerm = await FlutterLocalNotificationsPlugin()
         .resolvePlatformSpecificImplementation<
@@ -38,6 +46,10 @@ Future<void> main() async {
         isBatteryOptimizationDisabled == false) {
       await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
     }
+    if (StorageBox.instance.isLaunched() == false) {
+      await initAutoStart();
+      await StorageBox.instance.setIsLaunched(true);
+    }
   }
   final deviceInfoPlugin = DeviceInfoPlugin();
   if (Platform.isAndroid) {
@@ -48,6 +60,16 @@ Future<void> main() async {
     await StorageBox.instance.setDeviceID(deviceInfo.identifierForVendor);
   }
   runApp(const MyApp());
+}
+
+Future<void> initAutoStart() async {
+  try {
+    final available = await (isAutoStartAvailable as FutureOr<bool?>);
+    kPrintLog(available);
+    if (available == true) await getAutoStartPermission();
+  } on PlatformException catch (e) {
+    kPrintLog(e);
+  }
 }
 
 class MyApp extends StatelessWidget {

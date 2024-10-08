@@ -18,6 +18,7 @@ class AddEmployeeController extends GetxController {
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final emailController = TextEditingController();
+  final nickNameController = TextEditingController();
   final phoneController = TextEditingController();
   final addressController = TextEditingController();
   final aadhaarController = TextEditingController();
@@ -51,6 +52,7 @@ class AddEmployeeController extends GetxController {
         formData: {
           'user_id': StorageBox.instance.getUserId(),
           'user_type': "Employee",
+          'nick_name': nickNameController.text,
           'first_name': firstNameController.text,
           'last_name': lastNameController.text,
           'mobile': phoneController.text,
@@ -326,6 +328,7 @@ class AddEmployeeController extends GetxController {
   }
 
   void bindEmployee(Employee employee) {
+    nickNameController.text = employee.nickName ?? '';
     firstNameController.text = employee.firstName ?? '';
     lastNameController.text = employee.lastName ?? '';
     emailController.text = employee.email ?? '';
