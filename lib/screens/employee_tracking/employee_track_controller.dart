@@ -7,9 +7,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart'
-    as cm;
+as cm;
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gm;
-import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart' hide Cluster;
+import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart'
+    hide Cluster;
 
 import '../../models/internal/place.dart';
 import '../../network/api_service.dart';
@@ -73,7 +74,9 @@ class EmployeeTrackController extends GetxController {
             places.value = trackItems
                 .asMap()
                 .entries
-                .map((e) => Place(
+                .map((e) =>
+                Place(
+                    title: (e.key + 1).toString(),
                     name: e.value.ln ?? '',
                     latLng: gm.LatLng(
                         double.tryParse(e.value.la ?? '0.0') ?? 0.0,
@@ -133,7 +136,9 @@ class EmployeeTrackController extends GetxController {
               kPrintLog(p.name);
             }
           },
-          infoWindow: cluster.items.length == 1 ? (gm.InfoWindow(title: cluster.items.map((e) => e.name).join())) : InfoWindow.noText,
+          infoWindow: cluster.items.length == 1 ? (gm.InfoWindow(
+              title: cluster.items.last.title, snippet: cluster.items.last.name)) : InfoWindow
+              .noText,
           icon: await _getMarkerBitmap(cluster.isMultiple ? 125 : 75,
               text: cluster.isMultiple ? cluster.count.toString() : null),
         );
@@ -144,8 +149,10 @@ class EmployeeTrackController extends GetxController {
 
     final PictureRecorder pictureRecorder = PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint1 = Paint()..color = colorPrimaryDark;
-    final Paint paint2 = Paint()..color = colorWhite;
+    final Paint paint1 = Paint()
+      ..color = colorPrimaryDark;
+    final Paint paint2 = Paint()
+      ..color = colorWhite;
 
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint1);
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2.2, paint2);

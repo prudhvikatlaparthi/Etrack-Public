@@ -61,11 +61,12 @@ class HomeController extends GetxController {
     LatLng? position = await getCurrentPosition();
     kPrintLog("Sign In ${position?.latitude} ${position?.longitude}");
     if (inOutDetails.value.checkInTime?.isNotNullOrEmpty == true) {
+      // sign out
       await stopLocationService();
-      signInOut(position);
+      await signInOut(position);
     } else {
-      signInOut(position);
-      await startLocationService();
+      // sign in
+      await signInOut(position);
     }
   }
 
@@ -89,6 +90,7 @@ class HomeController extends GetxController {
           await StorageBox.instance.setImei(empAtt.deviceInfo?.imei);
           if (empAtt.checkOutTime.isNullOrEmpty) {
             if (!await isLocationServiceRunning()) {
+              await Future.delayed(const Duration(seconds: 5));
               startLocationService();
             }
           }

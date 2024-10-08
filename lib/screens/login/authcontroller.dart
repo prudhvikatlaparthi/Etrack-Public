@@ -1,4 +1,5 @@
 import 'package:e_track/models/auth_response.dart';
+import 'package:e_track/screens/home/homecontroller.dart';
 import 'package:e_track/utils/encryption.dart';
 import 'package:e_track/utils/storagebox.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +54,7 @@ class AuthController extends GetxController {
           await StorageBox.instance.setUserId(authData.userId);
           await StorageBox.instance.setUserType(authData.userType);
           await StorageBox.instance.setStopSync(false);
+          Get.delete<HomeController>();
           Get.off(() => HomeScreen());
           Get.delete<AuthController>();
         } else {

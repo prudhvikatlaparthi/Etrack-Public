@@ -216,12 +216,12 @@ Future<void> getLocation(
           enableVibration: false,
           enableLights: false,
           sound: null,
-          importance: Importance.high,
-          priority: Priority.high,
+          importance: Importance.low,
+          priority: Priority.low,
         ),
       ),
     );
-    await Future.delayed(const Duration(seconds: 30));
+    await Future.delayed(const Duration(seconds: 60));
   }
 }
 

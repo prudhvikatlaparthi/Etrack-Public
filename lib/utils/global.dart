@@ -47,8 +47,7 @@ Future<void> logOut() async {
   String deviceId = StorageBox.instance.getDeviceID();
   await StorageBox.instance.clear();
   await StorageBox.instance.setDeviceID(deviceId);
-  Get.back();
-  Get.off(() => LoginScreen());
+  Get.off(() => const LoginScreen());
 }
 
 extension StringExtensions on String? {

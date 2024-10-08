@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../utils/global.dart';
+import '../change_password/change_password_controller.dart';
 import '../employees/employee_controller.dart';
 import '../employees/employees_screen.dart';
 
@@ -118,6 +119,7 @@ class AppDrawer extends StatelessWidget {
                 Get.back();
                 await Future.delayed(const Duration(milliseconds: 400),
                         () {
+                          Get.delete<ChangePasswordController>();
                       Get.to(() => ChangePasswordScreen());
                     });
               },
@@ -132,6 +134,7 @@ class AppDrawer extends StatelessWidget {
                 ),
               ),
               onTap: () {
+                Get.back();
                 logOut();
               },
             ),
