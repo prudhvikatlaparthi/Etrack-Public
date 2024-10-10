@@ -37,7 +37,7 @@ class AuthController extends GetxController {
           'mobile_number': email,
           'user_type': 'Customer',
           'password': password,
-          'device_token': StorageBox.instance.getDeviceID()
+          'device_token': await StorageBox.instance.getDeviceID()
         },
         contentType: 'application/json',
       );
@@ -55,7 +55,7 @@ class AuthController extends GetxController {
           await StorageBox.instance.setUserType(authData.userType);
           await StorageBox.instance.setStopSync(false);
           Get.delete<HomeController>();
-          Get.off(() => HomeScreen());
+          Get.off(() => const HomeScreen());
           Get.delete<AuthController>();
         } else {
           showToast(message: response.data['message']);
@@ -69,9 +69,9 @@ class AuthController extends GetxController {
     }
   }
 
-  void autoLogin() {
-    final username = StorageBox.instance.getUsername();
-    final password = StorageBox.instance.getPassword();
+  Future<void> autoLogin() async {
+    final username = await StorageBox.instance.getUsername();
+    final password = await StorageBox.instance.getPassword();
     emailTextController.text = username;
     passwordTextController.text = aesDecrypt(password) ?? '';
     authenticate(username, password);

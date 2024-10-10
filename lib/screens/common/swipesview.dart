@@ -1,5 +1,5 @@
+import 'package:e_track/screens/common/populate_row_item.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import '../../utils/colors.dart';
 
@@ -15,47 +15,11 @@ Widget swipesView({required String inTime, required String outTime}) {
       const SizedBox(
         height: 10,
       ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: Get.width * 0.1,
-          ),
-          Text(
-            "First IN Time:",
-            style: TextStyle(color: colorBlack),
-          ),
-          SizedBox(
-            width: Get.width * 0.15,
-          ),
-          Text(
-            inTime,
-            style: TextStyle(fontWeight: FontWeight.w600, color: colorBlack),
-          ),
-          Spacer(),
-        ],
-      ),
+      PopulateRowItem(label: "First IN Time:", value: inTime),
       const SizedBox(
         height: 10,
       ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: Get.width * 0.1,
-          ),
-          Text(
-            "Last OUT Time:",
-            style: TextStyle(color: colorBlack),
-          ),
-          SizedBox(
-            width: Get.width * 0.15,
-          ),
-          Text(outTime,
-              style: TextStyle(fontWeight: FontWeight.w600, color: colorBlack)),
-          Spacer(),
-        ],
-      ),
+      PopulateRowItem(label: "Last OUT Time:", value: outTime)
     ],
   );
 }

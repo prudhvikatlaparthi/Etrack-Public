@@ -51,9 +51,9 @@ class EmployeeAttendanceController extends GetxController {
       showLoader();
       final response = await ApiService.instance
           .request('etrack/employee_attendance', DioMethod.get, param: {
-        'user_id': StorageBox.instance.getUserId(),
-        'device_token': StorageBox.instance.getDeviceID(),
-        'user_type': StorageBox.instance.getUserType(),
+        'user_id': await StorageBox.instance.getUserId(),
+        'device_token': await StorageBox.instance.getDeviceID(),
+        'user_type': await StorageBox.instance.getUserType(),
         'attendance_date': DateFormat("yyyy-MM-dd").format(date.value),
       });
       dismissLoader();

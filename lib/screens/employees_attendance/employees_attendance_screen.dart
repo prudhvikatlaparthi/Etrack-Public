@@ -91,7 +91,7 @@ class _EmployeesAttendanceScreenState extends State<EmployeesAttendanceScreen> {
                             Expanded(
                               child: Column(
                                 children: [
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
                                   PopulateRowItem(
@@ -124,7 +124,7 @@ class _EmployeesAttendanceScreenState extends State<EmployeesAttendanceScreen> {
                                     label: 'Status:',
                                     value: employee.status,
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
                                 ],

@@ -21,9 +21,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       controller.initPackageInfo();
-      if (StorageBox.instance.getUserId().isNotNullOrEmpty) {
+      if ((await StorageBox.instance.getUserId()).isNotNullOrEmpty) {
         controller.autoLogin();
       }
     });

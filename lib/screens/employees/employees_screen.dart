@@ -91,7 +91,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                         child: Card(
                           child: Column(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               PopulateRowItem(
@@ -112,7 +112,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                                 label: 'Mobile:',
                                 value: employee.mobile,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                             ],

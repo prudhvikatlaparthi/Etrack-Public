@@ -66,7 +66,7 @@ class _EmployeeTrackScreenState extends State<EmployeeTrackScreen> {
         child: SingleChildScrollView(
             child: Column(
           children: [
-            Container(
+            SizedBox(
                 width: double.infinity,
                 height: 300,
                 child: ClipRRect(
@@ -97,7 +97,7 @@ class _EmployeeTrackScreenState extends State<EmployeeTrackScreen> {
             swipesView(
                 inTime: formatDateTime(widget.swipeInTime),
                 outTime: formatDateTime(widget.swipeOutTime)),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Obx(() => PopulateRowItem(
