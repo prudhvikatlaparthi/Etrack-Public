@@ -40,12 +40,6 @@ Future<bool> handleLocationPermission(bool isSilent) async {
       return false;
     }
   }
-  /*if (permission == LocationPermission.deniedForever) {
-    showToast(
-        message:
-            'Location permissions are permanently denied, we cannot request permissions.');
-    return false;
-  }*/
   return true;
 }
 
@@ -66,7 +60,7 @@ Future<void> initializeService() async {
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
       appName, // id
       notificationTitle, // title
-      importance: Importance.high,
+      importance: Importance.low,
       // importance must be at low or higher level
       playSound: false,
       sound: null,
@@ -174,55 +168,67 @@ void onStart(ServiceInstance service) async {
 
 Future<void> getLocation(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
-  while (!StorageBox.instance.isStopSync()) {
+  while (!await StorageBox.instance.isStopSync()) {
+    if ((await StorageBox.instance.getImei()).isNullOrEmpty) {
+      showNotification(
+          flutterLocalNotificationsPlugin, "Problem occurred, please check IMEI");
+      await Future.delayed(const Duration(minutes: timeInterval));
+      continue;
+    }
     LatLng? position = await getCurrentPosition();
     String body = "";
     final dateTime = DateTime.now();
-    if (position != null && StorageBox.instance.getImei().isNotNullOrEmpty) {
+    if (position != null) {
       body = "last synced at ${DateFormat("hh:mm a").format(dateTime)}";
       kPrintLog('FLUTTER BACKGROUND SERVICE: $dateTime');
       try {
-        SocketConnection socket = SocketConnection.instance;
-        await socket.connect('13.235.142.155', 4307);
-        socket.sendData(
-            '${StorageBox.instance.getImei()},${DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime.toUtc())},${position.latitude},${position.longitude},0,0,5,1,50',
-            (message) {
-          body = message;
-        });
+        if (await isInternetAvailable()) {
+          SocketConnection socket = SocketConnection.instance;
+          await socket.connect('13.235.142.155', 4307);
+          socket.sendData(
+              '${await StorageBox.instance.getImei()},${DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime.toUtc())},${position.latitude},${position.longitude},0,0,5,1,50',
+              (message) {
+            body = message;
+          });
+        } else {
+          body = "Problem occurred, please check Internet Connection";
+        }
       } catch (e) {
         kPrintLog(e);
         body = "Problem occurred, please check Socket";
       }
     } else {
-      if (position == null) {
-        body = "Problem occurred, please check mobile GPS";
-      } else if (StorageBox.instance.getImei().isNullOrEmpty) {
-        body = "Problem occurred, please check IMEI";
-      }
+      body = "Problem occurred, please check mobile GPS";
       kPrintLog('FLUTTER BACKGROUND SERVICE Error: $body $dateTime');
     }
 
-    flutterLocalNotificationsPlugin.show(
-      channelID,
-      notificationTitle,
-      body,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          appName,
-          notificationTitle,
-          icon: notificationIconName,
-          ongoing: true,
-          playSound: false,
-          enableVibration: false,
-          enableLights: false,
-          sound: null,
-          importance: Importance.low,
-          priority: Priority.low,
-        ),
-      ),
-    );
-    await Future.delayed(const Duration(seconds: 60));
+    showNotification(flutterLocalNotificationsPlugin, body);
+    await Future.delayed(const Duration(minutes: timeInterval));
   }
+}
+
+void showNotification(
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
+    String body) {
+  flutterLocalNotificationsPlugin.show(
+    channelID,
+    notificationTitle,
+    body,
+    const NotificationDetails(
+      android: AndroidNotificationDetails(
+        appName,
+        notificationTitle,
+        icon: notificationIconName,
+        ongoing: true,
+        playSound: false,
+        enableVibration: false,
+        enableLights: false,
+        sound: null,
+        importance: Importance.low,
+        priority: Priority.low,
+      ),
+    ),
+  );
 }
 
 Future<bool> isLocationServiceRunning() async {

@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import '../../network/api_service.dart';
 import '../../utils/global.dart';
 import '../../utils/strings.dart';
-import '../common/loader.dart';
 
 class ChangePasswordController extends GetxController {
   
@@ -40,8 +39,8 @@ class ChangePasswordController extends GetxController {
         formData: {
           'old_password': aesEncrypt(currentPasswordController.text),
           'new_password': newPassword,
-          'user_id': StorageBox.instance.getUserId(),
-          'device_token': StorageBox.instance.getDeviceID()
+          'user_id': await StorageBox.instance.getUserId(),
+          'device_token': await StorageBox.instance.getDeviceID()
         },
         contentType: 'application/json',
       );

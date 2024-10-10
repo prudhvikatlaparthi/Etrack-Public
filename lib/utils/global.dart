@@ -44,9 +44,11 @@ String getTime(DateTime? date) {
 
 Future<void> logOut() async {
   await stopLocationService();
-  String deviceId = StorageBox.instance.getDeviceID();
+  String deviceId = await StorageBox.instance.getDeviceID();
   await StorageBox.instance.clear();
   await StorageBox.instance.setDeviceID(deviceId);
+  await StorageBox.instance.setStopSync(true);
+  await StorageBox.instance.setIsLaunched(true);
   Get.off(() => const LoginScreen());
 }
 
@@ -82,19 +84,17 @@ void kPrintLog(Object? message) {
   }
 }
 
-bool isAdmin() {
-  return StorageBox.instance.getUserType().toLowerCase() ==
+Future<bool> isAdmin() async {
+  return (await StorageBox.instance.getUserType()).toLowerCase() ==
       'Customer'.toLowerCase();
 }
 
 showLoader() {
-  kPrintLog("showloader");
   Get.dialog(const PopScope(canPop: false, child: Loader()),
       barrierDismissible: false);
 }
 
 dismissLoader() {
-  kPrintLog("dismiss loader 1");
   if (Get.isDialogOpen == true) {
     kPrintLog("dismiss loader 2");
     Navigator.of(Get.overlayContext!, rootNavigator: true).pop();

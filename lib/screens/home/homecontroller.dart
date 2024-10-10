@@ -75,10 +75,10 @@ class HomeController extends GetxController {
       showLoader();
       final response = await ApiService.instance
           .request('etrack/my_attendance', DioMethod.get, param: {
-        'user_id': StorageBox.instance.getUserId(),
-        'employee_id': StorageBox.instance.getUserId(),
-        'device_token': StorageBox.instance.getDeviceID(),
-        'user_type': StorageBox.instance.getUserType(),
+        'user_id': await StorageBox.instance.getUserId(),
+        'employee_id': await StorageBox.instance.getUserId(),
+        'device_token': await StorageBox.instance.getDeviceID(),
+        'user_type': await StorageBox.instance.getUserType(),
       });
       dismissLoader();
       if (response.statusCode == 200) {
@@ -90,7 +90,6 @@ class HomeController extends GetxController {
           await StorageBox.instance.setImei(empAtt.deviceInfo?.imei);
           if (empAtt.checkOutTime.isNullOrEmpty) {
             if (!await isLocationServiceRunning()) {
-              await Future.delayed(const Duration(seconds: 5));
               startLocationService();
             }
           }
@@ -129,10 +128,10 @@ class HomeController extends GetxController {
     try {
       final response = await ApiService.instance
           .request('etrack/$endUrl', DioMethod.post, formData: {
-        'user_id': StorageBox.instance.getUserId(),
-        'employee_id': StorageBox.instance.getUserId(),
-        'device_token': StorageBox.instance.getDeviceID(),
-        'user_type': StorageBox.instance.getUserType(),
+        'user_id': await StorageBox.instance.getUserId(),
+        'employee_id': await StorageBox.instance.getUserId(),
+        'device_token': await StorageBox.instance.getDeviceID(),
+        'user_type': await StorageBox.instance.getUserType(),
         ...payload
       });
       dismissLoader();

@@ -1,94 +1,158 @@
 import 'package:e_track/utils/encryption.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:synchronized/synchronized.dart';
 
 class StorageBox {
+  final lock = Lock();
+
   StorageBox._singleton();
 
   static final StorageBox instance = StorageBox._singleton();
 
-  final _box = GetStorage();
-
   Future<void> setFullName(String? value) async {
-    await _box.write("FullName", value);
+    await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString("FullName", value ?? '');
+    });
   }
 
-  String getFullName() {
-    return _box.read("FullName") ?? '';
+  Future<String> getFullName() async {
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      return sp.getString("FullName") ?? '';
+    });
   }
 
   Future<void> setUsername(String value) async {
-    await _box.write("Username", aesEncrypt(value));
+    await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString("Username", aesEncrypt(value) ?? '');
+    });
   }
 
-  String getUsername() {
-    return aesDecrypt(_box.read("Username")) ?? '';
+  Future<String> getUsername() async {
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      return aesDecrypt(sp.getString("Username")) ?? '';
+    });
   }
 
   Future<void> setPassword(String value) async {
-    await _box.write("Password", value);
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString("Password", value);
+    });
   }
 
-  String getPassword() {
-    return _box.read("Password") ?? '';
+  Future<String> getPassword() async {
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      return sp.getString("Password") ?? '';
+    });
   }
 
   Future<void> setUserType(String? value) async {
-    await _box.write("UserType", value);
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString("UserType", value ?? '');
+    });
   }
 
-  String getUserType() {
-    return _box.read("UserType") ?? '';
+  Future<String> getUserType() async {
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      return sp.getString("UserType") ?? '';
+    });
   }
 
   Future<void> setDeviceID(String? value) async {
-    await _box.write("DEVICE_ID", value);
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString("DEVICE_ID", value ?? '');
+    });
   }
 
-  String getDeviceID() {
-    return _box.read("DEVICE_ID") ?? '';
+  Future<String> getDeviceID() async {
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      return sp.getString("DEVICE_ID") ?? '';
+    });
   }
 
   Future<void> setStopSync(bool value) async {
-    await _box.write("StopSync", value);
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setBool("StopSync", value);
+    });
   }
 
-  bool isStopSync() {
-    return _box.read("StopSync") ?? false;
+  Future<bool> isStopSync() async {
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      return sp.getBool("StopSync") ?? false;
+    });
   }
 
   Future<void> setProfilePic(String? value) async {
-    await _box.write("ProfilePic", value);
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString("ProfilePic", value ?? '');
+    });
   }
 
-  String? getProfilePic() {
-    return _box.read("ProfilePic");
+  Future<String?> getProfilePic() async {
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      return sp.getString("ProfilePic");
+    });
   }
 
   Future<void> setImei(String? value) async {
-    await _box.write("IMEI", value);
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString("IMEI", value ?? '');
+    });
   }
 
-  String? getImei() {
-    return _box.read("IMEI");
+  Future<String?> getImei() async {
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      return sp.getString("IMEI");
+    });
   }
 
   Future<void> setUserId(String? value) async {
-    await _box.write("UserId", value);
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString("UserId", value ?? '');
+    });
   }
 
-  String? getUserId() {
-    return _box.read("UserId");
+  Future<String?> getUserId() async {
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      return sp.getString("UserId");
+    });
   }
 
   Future<void> clear() async {
-    await _box.erase();
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      await sp.clear();
+    });
   }
 
   Future<void> setIsLaunched(bool value) async {
-    await _box.write("IsLaunched", value);
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setBool("IsLaunched", value);
+    });
   }
 
-  bool isLaunched() {
-    return _box.read("IsLaunched") ?? false;
+  Future<bool> isLaunched() async {
+    return await lock.synchronized(() async {
+      final sp = await SharedPreferences.getInstance();
+      return sp.getBool("IsLaunched") ?? false;
+    });
   }
 }

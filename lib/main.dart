@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -21,7 +20,7 @@ import 'utils/storagebox.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GetStorage.init();
+  // await GetStorage.init(appName);
   await initializeService();
   await handleLocationPermission(true);
   final isNotification = await Permission.notification.status;
@@ -46,7 +45,7 @@ Future<void> main() async {
         isBatteryOptimizationDisabled == false) {
       await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
     }
-    if (StorageBox.instance.isLaunched() == false) {
+    if (await StorageBox.instance.isLaunched() == false) {
       await initAutoStart();
       await StorageBox.instance.setIsLaunched(true);
     }

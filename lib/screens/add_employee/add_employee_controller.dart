@@ -50,7 +50,7 @@ class AddEmployeeController extends GetxController {
         endpoint,
         DioMethod.post,
         formData: {
-          'user_id': StorageBox.instance.getUserId(),
+          'user_id': await StorageBox.instance.getUserId(),
           'user_type': "Employee",
           'nick_name': nickNameController.text,
           'first_name': firstNameController.text,
@@ -65,7 +65,7 @@ class AddEmployeeController extends GetxController {
           'zipcode': zipCodeController.text,
           'pincode': zipCodeController.text,
           'aadhar_number': aadhaarController.text,
-          'device_token': StorageBox.instance.getDeviceID(),
+          'device_token': await StorageBox.instance.getDeviceID(),
           if (selectedEmployee.value?.employeeId.isNotNullOrEmpty == true)
             'employee_id': selectedEmployee.value?.employeeId,
           if (selectedEmployee.value != null)
@@ -127,29 +127,29 @@ class AddEmployeeController extends GetxController {
       return false;
     }
     if (selectedState.value == '-1') {
-      showToast(message: "Please provide State");
+      showToast(message: "Please provide City");
       return false;
     }
-    if (selectedDistrict.value == '-1') {
+    /*if (selectedDistrict.value == '-1') {
       showToast(message: "Please provide District");
       return false;
-    }
+    }*/
     if (addressController.text.isBlank == true) {
       showToast(message: "Please provide Address");
       return false;
     }
-    if (zipCodeController.text.isBlank == true ||
+    /*if (zipCodeController.text.isBlank == true ||
         zipCodeController.text.length > 6 ||
         zipCodeController.text.length < 6) {
       showToast(message: "Please provide valid PIN code");
       return false;
-    }
-    if (aadhaarController.text.isBlank == true ||
+    }*/
+    /*if (aadhaarController.text.isBlank == true ||
         aadhaarController.text.length > 12 ||
         aadhaarController.text.length < 12) {
       showToast(message: "Please provide valid Aadhaar no.");
       return false;
-    }
+    }*/
     return true;
   }
 
@@ -220,7 +220,7 @@ class AddEmployeeController extends GetxController {
                 .where((e) => e.value == selectedEmployee.value!.stateId!)
                 .isNotEmpty) {
               selectedState.value = selectedEmployee.value!.stateId!;
-              fetchDistricts(isForBinding: isForBinding);
+              // fetchDistricts(isForBinding: isForBinding);
             }
           }
         } else {
@@ -235,7 +235,7 @@ class AddEmployeeController extends GetxController {
     }
   }
 
-  fetchDistricts({bool isForBinding = false}) async {
+  /*fetchDistricts({bool isForBinding = false}) async {
     selectedDistrict.value = '-1';
     try {
       showLoader();
@@ -276,7 +276,7 @@ class AddEmployeeController extends GetxController {
       dismissLoader();
       showToast(message: e.toString());
     }
-  }
+  }*/
 
   getEmployeeDetails(String shareUserId) async {
     showLoader();
@@ -285,10 +285,10 @@ class AddEmployeeController extends GetxController {
         'etrack/employee_detail',
         DioMethod.post,
         formData: {
-          'user_id': StorageBox.instance.getUserId(),
+          'user_id': await StorageBox.instance.getUserId(),
           'employee_id': shareUserId,
-          'user_type': StorageBox.instance.getUserType(),
-          'device_token': StorageBox.instance.getDeviceID(),
+          'user_type': await StorageBox.instance.getUserType(),
+          'device_token': await StorageBox.instance.getDeviceID(),
         },
         contentType: 'application/json',
       );

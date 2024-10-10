@@ -50,7 +50,7 @@ class EmployeeTrackController extends GetxController {
         'latlng_format': '1',
         'from_date': swipeInTime,
         'to_date': swipeOutTime,
-        'device_token': StorageBox.instance.getDeviceID(),
+        'device_token': await StorageBox.instance.getDeviceID(),
         'user_type': 'Employee',
       });
       dismissLoader();

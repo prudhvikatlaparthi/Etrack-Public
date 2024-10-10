@@ -33,10 +33,13 @@ class AppDrawer extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    backgroundColor: colorWhite,
-                    radius: 36,
-                    backgroundImage: getProfileImage(),
+                  FutureBuilder(
+                    future: getProfileImage(),
+                    builder: (c, t) => CircleAvatar(
+                      backgroundColor: colorWhite,
+                      radius: 36,
+                      backgroundImage: t.data,
+                    ),
                   ),
                   const Spacer(),
                   Wrap(
@@ -52,13 +55,18 @@ class AppDrawer extends StatelessWidget {
                       const SizedBox(
                         width: 10,
                       ),*/
-                      Text(
-                        StorageBox.instance.getFullName(),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            color: colorWhite,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600),
+                      FutureBuilder(
+                        future: StorageBox.instance.getFullName(),
+                        builder: (c, t) => t.data.isNotNullOrEmpty
+                            ? Text(
+                                t.data!,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    color: colorWhite,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600),
+                              )
+                            : const SizedBox(),
                       ),
                     ],
                   ),
@@ -75,38 +83,44 @@ class AppDrawer extends StatelessWidget {
                 Get.back();
               },
             ),
-            isAdmin()
-                ? ListTile(
-                    title: const Text(
-                      'My Employees',
-                      style: TextStyle(color: colorBlack, fontSize: 16),
-                    ),
-                    onTap: () async {
-                      Get.back();
-                      await Future.delayed(const Duration(milliseconds: 400),
-                          () {
-                        Get.delete<EmployeeController>();
-                        Get.to(() => const EmployeesScreen());
-                      });
-                    },
-                  )
-                : const SizedBox(),
-            isAdmin()
-                ? ListTile(
-              title: const Text(
-                'E Attendance',
-                style: TextStyle(color: colorBlack, fontSize: 16),
-              ),
-              onTap: () async {
-                Get.back();
-                await Future.delayed(const Duration(milliseconds: 400),
-                        () {
-                      Get.delete<EmployeeAttendanceController>();
-                      Get.to(() => const EmployeesAttendanceScreen());
-                    });
-              },
-            )
-                : const SizedBox(),
+            FutureBuilder(
+              future: isAdmin(),
+              builder: (c, t) => t.data == true
+                  ? ListTile(
+                      title: const Text(
+                        'My Employees',
+                        style: TextStyle(color: colorBlack, fontSize: 16),
+                      ),
+                      onTap: () async {
+                        Get.back();
+                        await Future.delayed(const Duration(milliseconds: 400),
+                            () {
+                          Get.delete<EmployeeController>();
+                          Get.to(() => const EmployeesScreen());
+                        });
+                      },
+                    )
+                  : const SizedBox(),
+            ),
+            FutureBuilder(
+              future: isAdmin(),
+              builder: (c, t) => t.data == true
+                  ? ListTile(
+                      title: const Text(
+                        'E Attendance',
+                        style: TextStyle(color: colorBlack, fontSize: 16),
+                      ),
+                      onTap: () async {
+                        Get.back();
+                        await Future.delayed(const Duration(milliseconds: 400),
+                            () {
+                          Get.delete<EmployeeAttendanceController>();
+                          Get.to(() => const EmployeesAttendanceScreen());
+                        });
+                      },
+                    )
+                  : const SizedBox(),
+            ),
             ListTile(
               title: const Text(
                 'Change Password',
@@ -117,14 +131,12 @@ class AppDrawer extends StatelessWidget {
               ),
               onTap: () async {
                 Get.back();
-                await Future.delayed(const Duration(milliseconds: 400),
-                        () {
-                          Get.delete<ChangePasswordController>();
-                      Get.to(() => ChangePasswordScreen());
-                    });
+                await Future.delayed(const Duration(milliseconds: 400), () {
+                  Get.delete<ChangePasswordController>();
+                  Get.to(() => ChangePasswordScreen());
+                });
               },
-            )
-            ,
+            ),
             ListTile(
               title: const Text(
                 'Log out',
@@ -151,9 +163,10 @@ class AppDrawer extends StatelessWidget {
         ));
   }
 
-  ImageProvider getProfileImage() {
-    final profilePic = StorageBox.instance.getProfilePic();
-    if (profilePic.isNotNullOrEmpty && !profilePic!.contains("uploads/no-image.png")) {
+  Future<ImageProvider<Object>> getProfileImage() async {
+    final profilePic = await StorageBox.instance.getProfilePic();
+    if (profilePic.isNotNullOrEmpty &&
+        !profilePic!.contains("uploads/no-image.png")) {
       return NetworkImage(profilePic);
     } else {
       return const AssetImage("assets/images/icons/user.png");

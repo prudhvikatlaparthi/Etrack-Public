@@ -57,7 +57,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                   Get.dialog(Center(
                     child: Container(
                       width: 200,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                           color: colorWhite,
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                       child: Row(
@@ -72,7 +72,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                                 controller.selectedEmployee.value?.profileImage = null;
                                 controller.profilePic.value = photo;
                               },
-                              child: Text('Camera')),
+                              child: const Text('Camera')),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
@@ -90,7 +90,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                                 controller.selectedEmployee.value?.profileImage = null;
                                 controller.profilePic.value = photo;
                               },
-                              child: Text('Gallery')),
+                              child: const Text('Gallery')),
                         ],
                       ),
                     ),
@@ -179,21 +179,21 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
               Obx(
                 () => DropdownView(
                   mandatory: true,
-                  label: "State",
+                  label: "City",
                   selectedValue: controller.selectedState.value,
                   items: controller.states.value,
                   onChange: (String data) {
                     controller.selectedState.value = data;
-                    if (controller.selectedState.value == '-1') {
+                    /*if (controller.selectedState.value == '-1') {
                       controller.districts.value = [defaultDropdown()];
                       controller.selectedDistrict.value = '-1';
                     } else {
                       controller.fetchDistricts();
-                    }
+                    }*/
                   },
                 ),
               ),
-              Obx(
+              /*Obx(
                 () => DropdownView(
                   mandatory: true,
                   label: "District",
@@ -203,7 +203,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                     controller.selectedDistrict.value = data;
                   },
                 ),
-              ),
+              ),*/
               const SizedBox(
                 height: 15,
               ),
@@ -216,7 +216,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
               const SizedBox(
                 height: 10,
               ),
-              EditText(
+              /*EditText(
                 label: "PIN code",
                 controller: controller.zipCodeController,
                 mandatory: true,
@@ -229,8 +229,8 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
               ),
               const SizedBox(
                 height: 10,
-              ),
-              EditText(
+              ),*/
+              /*EditText(
                 label: "Aadhaar no.",
                 controller: controller.aadhaarController,
                 mandatory: true,
@@ -243,7 +243,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
               ),
               const SizedBox(
                 height: 10,
-              ),
+              ),*/
             ],
           ),
         ),

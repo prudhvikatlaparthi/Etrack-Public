@@ -2,6 +2,7 @@
 
 const channelID = 586;
 const notificationIconName = 'ic_bg_service_small';
+const timeInterval = 1;
 
 
 // Strings

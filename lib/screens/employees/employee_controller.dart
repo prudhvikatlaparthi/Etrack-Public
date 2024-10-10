@@ -46,9 +46,9 @@ class EmployeeController extends GetxController {
       showLoader();
       final response = await ApiService.instance
           .request('etrack/my_employees_list', DioMethod.get, param: {
-        'user_id': StorageBox.instance.getUserId(),
-        'device_token': StorageBox.instance.getDeviceID(),
-        'user_type': StorageBox.instance.getUserType(),
+        'user_id': await StorageBox.instance.getUserId(),
+        'device_token': await StorageBox.instance.getDeviceID(),
+        'user_type': await StorageBox.instance.getUserType(),
       });
       dismissLoader();
       if (response.statusCode == 200) {

@@ -10,7 +10,7 @@ import '../common/app_drawer.dart';
 import '../common/swipesview.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -73,13 +73,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Hi ${StorageBox.instance.getFullName().split(" ")[0]} 👋',
-                      style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: colorPrimaryDark),
-                    ),
+                    FutureBuilder(
+                        future: StorageBox.instance.getFullName(),
+                        builder: (c, t) => t.data.isNotNullOrEmpty
+                            ? Text(
+                                'Hi ${t.data!.split(" ")[0]} 👋',
+                                style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorPrimaryDark),
+                              )
+                            : const SizedBox()),
                     const SizedBox(
                       height: 20,
                     ),
@@ -172,9 +176,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 20,
                     ),
                     Obx(() => swipesView(
-                        inTime: formatDateTime(controller.inOutDetails.value.checkInTime),
-                        outTime:
-                        formatDateTime(controller.inOutDetails.value.checkOutTime))),
+                        inTime: formatDateTime(
+                            controller.inOutDetails.value.checkInTime),
+                        outTime: formatDateTime(
+                            controller.inOutDetails.value.checkOutTime))),
                   ],
                 )))));
   }
@@ -184,7 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
         controller.inOutDetails.value.checkOutTime?.isNotNullOrEmpty == true) {
       return "Sign In";
     }
-    return controller.inOutDetails.value.checkInTime?.isNullOrEmpty ?? true == true
+    return controller.inOutDetails.value.checkInTime?.isNullOrEmpty ??
+            true == true
         ? "Sign In"
         : "Sign Out";
   }
