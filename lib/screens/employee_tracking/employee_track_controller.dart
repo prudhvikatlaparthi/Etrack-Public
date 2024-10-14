@@ -3,11 +3,12 @@ import 'dart:ui';
 
 import 'package:e_track/models/track_item.dart';
 import 'package:e_track/utils/colors.dart';
+import 'package:e_track/utils/location_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart'
-as cm;
+    as cm;
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gm;
 import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart'
     hide Cluster;
@@ -20,26 +21,34 @@ import '../../utils/strings.dart';
 
 class EmployeeTrackController extends GetxController {
   final gm.CameraPosition googlePlex = const gm.CameraPosition(
-    target: gm.LatLng(17.4065, 78.4772),
-    zoom: 10.4746,
+    target: gm.LatLng(0, 0),
+    zoom: 15.4746,
   );
 
   final Rx<Set<gm.Marker>> markers = Rx({});
 
-  gm.GoogleMapController? mapController = null;
+  gm.GoogleMapController? mapController;
 
   final Rx<List<Place>> places = Rx([]);
 
   final Rx<String> lastKnownLocation = "".obs;
 
-  late cm.ClusterManager manager;
+  // late cm.ClusterManager manager;
 
-  // final Rx<Set<Polyline>> polyline = Rx({});
+  final Rx<Set<Polyline>> polyline = Rx({});
+
+  final enablePolyline = false.obs;
+
+  List<TrackItem> trackItems = [];
 
   Future<void> getAttendanceDetails(String empId, String deviceLinkId,
       String swipeInTime, String swipeOutTime) async {
     try {
       showLoader();
+      gm.LatLng? clatlng = await getCurrentPosition();
+      mapController?.animateCamera(gm.CameraUpdate.newLatLng(gm.LatLng(
+          clatlng?.latitude ?? 0.0,
+          clatlng?.longitude ?? 0.0)));
       final response = await ApiService.instance
           .request('etrack/track_report_etrack', DioMethod.get, param: {
         'user_id': empId,
@@ -56,7 +65,7 @@ class EmployeeTrackController extends GetxController {
       dismissLoader();
       if (response.statusCode == 200) {
         if (response.data['status'] == true) {
-          final List<TrackItem> trackItems = response.data['data']
+          trackItems = response.data['data']
               .map<TrackItem>((e) => TrackItem.fromJson(e))
               .toList();
           /*trackItems.add(TrackItem(la: '17.4401', lo: '78.3489'));
@@ -71,7 +80,7 @@ class EmployeeTrackController extends GetxController {
             for (int i = 0; i < trackItems.length; i++) {
               markerIcons.add(await _createCustomMarkerBitmap(i));
             }*/
-            places.value = trackItems
+            /*places.value = trackItems
                 .asMap()
                 .entries
                 .map((e) =>
@@ -82,30 +91,22 @@ class EmployeeTrackController extends GetxController {
                         double.tryParse(e.value.la ?? '0.0') ?? 0.0,
                         double.tryParse(e.value.lo ?? '0.0') ?? 0.0)))
                 .toList();
-            manager.setItems(places.value);
-            /*markers.value = trackItems
-                .asMap()
-                .entries
-                .map((e) => Marker(
-                    markerId: MarkerId(e.key.toString()),
-                    position: LatLng(
-                        double.tryParse(e.value.la ?? '0.0') ?? 0.0,
-                        double.tryParse(e.value.lo ?? '0.0') ?? 0.0),
-                    infoWindow: InfoWindow(
-                        title: (e.key + 1).toString(),
-                        snippet: e.value.ln ?? ''),
-                    icon: BitmapDescriptor.defaultMarker))
-                .toSet();*/
-            /*polyline.value = {
-              Polyline(
-                  polylineId: const PolylineId('0'),
-                  color: colorPrimaryDark,
-                  width: 2,
-                  points: trackItems
-                      .map((e) => LatLng(double.tryParse(e.la ?? '0.0') ?? 0.0,
-                          double.tryParse(e.lo ?? '0.0') ?? 0.0))
-                      .toList())
-            };*/
+            manager.setItems(places.value);*/
+            final localMarkers = <gm.Marker>[];
+            final m = trackItems.asMap().entries;
+            for (var e in m) {
+              localMarkers.add(Marker(
+                  markerId: MarkerId(e.key.toString()),
+                  position: LatLng(double.tryParse(e.value.la ?? '0.0') ?? 0.0,
+                      double.tryParse(e.value.lo ?? '0.0') ?? 0.0),
+                  infoWindow: InfoWindow(title: e.value.ln ?? ''),
+                  icon: await _getMarkerBitmap(110,
+                      text: (e.key + 1).toString(),
+                      p1: e.key == trackItems.length - 1
+                          ? Colors.green
+                          : Colors.redAccent)));
+            }
+            markers.value = localMarkers.toSet();
           }
         } else {
           showToast(message: response.data['message']);
@@ -125,34 +126,47 @@ class EmployeeTrackController extends GetxController {
     }, markerBuilder: _markerBuilder);
   }
 
+  void drawPolyline() {
+    if (enablePolyline.value) {
+      polyline.value = {
+        Polyline(
+            polylineId: const PolylineId('0'),
+            color: colorPrimaryDark,
+            width: 2,
+            points: trackItems
+                .map((e) => LatLng(double.tryParse(e.la ?? '0.0') ?? 0.0,
+                    double.tryParse(e.lo ?? '0.0') ?? 0.0))
+                .toList())
+      };
+    } else {
+      polyline.value = {};
+    }
+  }
+
   Future<Marker> Function(cm.Cluster<Place>) get _markerBuilder =>
-          (cluster) async {
+      (cluster) async {
         return Marker(
           markerId: MarkerId(cluster.getId()),
           position: cluster.location,
-          onTap: () {
-            print('---- $cluster');
-            for (var p in cluster.items) {
-              kPrintLog(p.name);
-            }
-          },
-          infoWindow: cluster.items.length == 1 ? (gm.InfoWindow(
-              title: cluster.items.last.title, snippet: cluster.items.last.name)) : InfoWindow
-              .noText,
+          onTap: () {},
+          infoWindow: cluster.items.length == 1
+              ? (gm.InfoWindow(
+                  title: cluster.items.last.title,
+                  snippet: cluster.items.last.name))
+              : InfoWindow.noText,
           icon: await _getMarkerBitmap(cluster.isMultiple ? 125 : 75,
               text: cluster.isMultiple ? cluster.count.toString() : null),
         );
       };
 
-  Future<BitmapDescriptor> _getMarkerBitmap(int size, {String? text}) async {
+  Future<BitmapDescriptor> _getMarkerBitmap(int size,
+      {String? text, Color p1 = Colors.redAccent}) async {
     if (kIsWeb) size = (size / 2).floor();
 
     final PictureRecorder pictureRecorder = PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint1 = Paint()
-      ..color = colorPrimaryDark;
-    final Paint paint2 = Paint()
-      ..color = colorWhite;
+    final Paint paint1 = Paint()..color = p1;
+    final Paint paint2 = Paint()..color = colorWhite;
 
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint1);
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2.2, paint2);

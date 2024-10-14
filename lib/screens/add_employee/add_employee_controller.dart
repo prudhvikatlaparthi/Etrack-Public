@@ -174,7 +174,7 @@ class AddEmployeeController extends GetxController {
               .toList());
           countries.value = apiCountries;
           if (countries.where((e) => e.value == '99').isNotEmpty) {
-            selectedCountry.value = '99';
+            selectedCountry.value = '49';
             await fetchStates();
           }
         } else {

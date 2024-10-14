@@ -96,7 +96,6 @@ showLoader() {
 
 dismissLoader() {
   if (Get.isDialogOpen == true) {
-    kPrintLog("dismiss loader 2");
     Navigator.of(Get.overlayContext!, rootNavigator: true).pop();
   }
 }

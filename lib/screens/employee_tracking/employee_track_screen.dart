@@ -33,7 +33,7 @@ class _EmployeeTrackScreenState extends State<EmployeeTrackScreen> {
 
   @override
   void initState() {
-    controller.manager = controller.initClusterManager();
+    // controller.manager = controller.initClusterManager();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final inTime = DateFormat("yyyy-MM-dd HH:mm:ss")
           .parse(widget.swipeInTime); //.toUtc();
@@ -59,6 +59,16 @@ class _EmployeeTrackScreenState extends State<EmployeeTrackScreen> {
           style: TextStyle(
               fontSize: 18, fontWeight: FontWeight.bold, color: colorBlack),
         ),
+        actions: [
+          Obx(
+            () => Switch(
+                value: controller.enablePolyline.value,
+                onChanged: (c) {
+                  controller.enablePolyline.toggle();
+                  controller.drawPolyline();
+                }),
+          )
+        ],
       ),
       body: SafeArea(
           child: Padding(
@@ -73,23 +83,24 @@ class _EmployeeTrackScreenState extends State<EmployeeTrackScreen> {
                     borderRadius: BorderRadius.circular(10),
                     child: Obx(
                       () => gm.GoogleMap(
-                          initialCameraPosition: controller.googlePlex,
-                          mapType: gm.MapType.normal,
-                          markers: controller.markers.value,
-                          scrollGesturesEnabled: true,
-                          zoomGesturesEnabled: true,
-                          myLocationButtonEnabled: false,
-                          gestureRecognizers: {
-                            Factory<OneSequenceGestureRecognizer>(
-                                () => EagerGestureRecognizer())
-                          },
-                          onMapCreated: (c) {
-                            controller.mapController = c;
-                            controller.manager.setMapId(c.mapId);
-                            kPrintLog("map created");
-                          },
-                          onCameraMove: controller.manager.onCameraMove,
-                          onCameraIdle: controller.manager.updateMap),
+                        initialCameraPosition: controller.googlePlex,
+                        mapType: gm.MapType.normal,
+                        markers: controller.markers.value,
+                        scrollGesturesEnabled: true,
+                        zoomGesturesEnabled: true,
+                        myLocationButtonEnabled: false,
+                        gestureRecognizers: {
+                          Factory<OneSequenceGestureRecognizer>(
+                              () => EagerGestureRecognizer())
+                        },
+                        polylines: controller.polyline.value,
+                        onMapCreated: (c) {
+                          controller.mapController = c;
+                          // controller.manager.setMapId(c.mapId);
+                        },
+                        // onCameraMove: controller.manager.onCameraMove,
+                        // onCameraIdle: controller.manager.updateMap
+                      ),
                     ))),
             const SizedBox(
               height: 20,

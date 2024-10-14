@@ -3,6 +3,7 @@ import 'package:e_track/screens/common/mybutton.dart';
 import 'package:e_track/screens/login/authcontroller.dart';
 import 'package:e_track/utils/colors.dart';
 import 'package:e_track/utils/global.dart';
+import 'package:e_track/utils/location_service.dart';
 import 'package:e_track/utils/storagebox.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,6 +26,10 @@ class _LoginScreenState extends State<LoginScreen> {
       controller.initPackageInfo();
       if ((await StorageBox.instance.getUserId()).isNotNullOrEmpty) {
         controller.autoLogin();
+      } else {
+        if(await isLocationServiceRunning()){
+          stopLocationService();
+        }
       }
     });
     super.initState();

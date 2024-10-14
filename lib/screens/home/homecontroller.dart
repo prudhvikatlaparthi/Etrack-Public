@@ -38,7 +38,6 @@ class HomeController extends GetxController {
   void callDate() {
     final date = getDate();
     _date.value = date;
-    kPrintLog(clockTimer);
     Future.delayed(Duration(seconds: clockTimer), () {
       clockTimer = 60;
       callDate();
