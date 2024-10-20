@@ -79,11 +79,11 @@ public class FlutterBackgroundServicePlugin implements FlutterPlugin, MethodCall
         boolean isForeground = config.isForeground();
         Intent intent = new Intent(context, BackgroundService.class);
 
-        /*if (isForeground) {
+        if (isForeground) {
             ContextCompat.startForegroundService(context, intent);
         } else {
-        }*/
-        context.startService(intent);
+            context.startService(intent);
+        }
     }
 
     @Override

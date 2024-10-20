@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:e_track/models/track_item.dart';
@@ -22,7 +23,7 @@ import '../../utils/strings.dart';
 class EmployeeTrackController extends GetxController {
   final gm.CameraPosition googlePlex = const gm.CameraPosition(
     target: gm.LatLng(0, 0),
-    zoom: 15.4746,
+    zoom: 18.4746,
   );
 
   final Rx<Set<gm.Marker>> markers = Rx({});
@@ -46,9 +47,8 @@ class EmployeeTrackController extends GetxController {
     try {
       showLoader();
       gm.LatLng? clatlng = await getCurrentPosition();
-      mapController?.animateCamera(gm.CameraUpdate.newLatLng(gm.LatLng(
-          clatlng?.latitude ?? 0.0,
-          clatlng?.longitude ?? 0.0)));
+      mapController?.animateCamera(gm.CameraUpdate.newLatLng(
+          gm.LatLng(clatlng?.latitude ?? 0.0, clatlng?.longitude ?? 0.0)));
       final response = await ApiService.instance
           .request('etrack/track_report_etrack', DioMethod.get, param: {
         'user_id': empId,
@@ -65,17 +65,22 @@ class EmployeeTrackController extends GetxController {
       dismissLoader();
       if (response.statusCode == 200) {
         if (response.data['status'] == true) {
-          trackItems = response.data['data']
+          List<TrackItem> acItems = response.data['data']
               .map<TrackItem>((e) => TrackItem.fromJson(e))
               .toList();
+          if(acItems.isEmpty){
+            showToast(message: "No data found.");
+            return;
+          }
+          trackItems = removeConsecutiveDuplicates(acItems);
           /*trackItems.add(TrackItem(la: '17.4401', lo: '78.3489'));
           trackItems.add(TrackItem(la: '17.4399', lo: '78.4983'));
           trackItems.add(TrackItem(la: '17.4209', lo: '78.5461'));*/
           if (trackItems.isNotEmpty) {
             lastKnownLocation.value = trackItems.last.ln ?? '';
-            mapController?.animateCamera(gm.CameraUpdate.newLatLng(gm.LatLng(
+            mapController?.animateCamera(gm.CameraUpdate.newCameraPosition(gm.CameraPosition(target: gm.LatLng(
                 double.tryParse(trackItems.last.la ?? '0.0') ?? 0.0,
-                double.tryParse(trackItems.last.lo ?? '0.0') ?? 0.0)));
+                double.tryParse(trackItems.last.lo ?? '0.0') ?? 0.0),zoom: 18)));
             /*final markerIcons = <BitmapDescriptor>[];
             for (int i = 0; i < trackItems.length; i++) {
               markerIcons.add(await _createCustomMarkerBitmap(i));
@@ -192,5 +197,45 @@ class EmployeeTrackController extends GetxController {
     final data = await img.toByteData(format: ImageByteFormat.png) as ByteData;
 
     return BitmapDescriptor.fromBytes(data.buffer.asUint8List());
+  }
+
+// Function to calculate distance between two LatLng points using Haversine formula
+  double haversineDistance(double lat1, double lon1, double lat2, double lon2) {
+    const R = 6371000; // Radius of the Earth in meters
+    final dLat = _degreesToRadians(lat2 - lat1);
+    final dLon = _degreesToRadians(lon2 - lon1);
+
+    final a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_degreesToRadians(lat1)) *
+            cos(_degreesToRadians(lat2)) *
+            sin(dLon / 2) *
+            sin(dLon / 2);
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return R * c; // Distance in meters
+  }
+
+  double _degreesToRadians(double degrees) {
+    return degrees * pi / 180;
+  }
+
+  List<TrackItem> removeConsecutiveDuplicates(List<TrackItem> latLngList,
+      {double threshold = 10.0}) {
+    if (latLngList.isEmpty) return [];
+
+    final filteredList = <TrackItem>[latLngList[0]];
+
+    for (int i = 1; i < latLngList.length; i++) {
+      final previous = filteredList.last;
+      final current = latLngList[i];
+      final distance = haversineDistance(double.tryParse(previous.la ?? '0.0') ?? 0.0, double.tryParse(previous.lo ?? '0.0') ?? 0.0,
+          double.tryParse(current.la ?? '0.0') ?? 0.0, double.tryParse(current.lo ?? '0.0') ?? 0.0);
+
+      if (distance >= threshold) {
+        filteredList.add(current);
+      }
+    }
+
+    return filteredList;
   }
 }

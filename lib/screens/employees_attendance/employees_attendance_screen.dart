@@ -132,6 +132,10 @@ class _EmployeesAttendanceScreenState extends State<EmployeesAttendanceScreen> {
                             ),
                             TextButton(
                                 onPressed: () {
+                                  if(employee.deviceInfo?.deviceLinkId.isNullOrEmpty == true){
+                                    showToast(message: "Device Link Id not found");
+                                    return;
+                                  }
                                   Get.delete<EmployeeTrackController>();
                                   Get.to(() => EmployeeTrackScreen(
                                         employeeId: employee.employeeId!,

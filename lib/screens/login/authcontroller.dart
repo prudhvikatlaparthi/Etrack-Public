@@ -53,7 +53,6 @@ class AuthController extends GetxController {
           await StorageBox.instance.setProfilePic(authData.profileImage);
           await StorageBox.instance.setUserId(authData.userId);
           await StorageBox.instance.setUserType(authData.userType);
-          await StorageBox.instance.setStopSync(false);
           Get.delete<HomeController>();
           Get.off(() => const HomeScreen());
           Get.delete<AuthController>();

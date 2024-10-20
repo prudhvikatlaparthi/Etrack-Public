@@ -28,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
         controller.autoLogin();
       } else {
         if(await isLocationServiceRunning()){
-          stopLocationService();
+          await stopLocationService();
         }
       }
     });

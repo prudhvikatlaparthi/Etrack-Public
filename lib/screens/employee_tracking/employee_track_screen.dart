@@ -37,9 +37,24 @@ class _EmployeeTrackScreenState extends State<EmployeeTrackScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final inTime = DateFormat("yyyy-MM-dd HH:mm:ss")
           .parse(widget.swipeInTime); //.toUtc();
-      final outTime = DateFormat("yyyy-MM-dd HH:mm:ss").parse(widget
-              .swipeOutTime ??
-          DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now())); //.toUtc();
+      final DateTime outTime;
+      if (widget.swipeOutTime.isNotNullOrEmpty) {
+        outTime = DateFormat("yyyy-MM-dd HH:mm:ss")
+            .parse(widget.swipeOutTime!); //.toUtc();
+      } else {
+        final currentDateTime = DateTime.now();
+        if (inTime.day == currentDateTime.day &&
+            inTime.month == currentDateTime.month &&
+            inTime.year == currentDateTime.year) {
+          outTime = DateFormat("yyyy-MM-dd HH:mm:ss").parse(
+              DateFormat('yyyy-MM-dd HH:mm:ss')
+                  .format(DateTime.now())); //.toUtc();
+        } else {
+          outTime = DateFormat("yyyy-MM-dd HH:mm:ss").parse(
+              DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime(inTime.year,
+                  inTime.month, inTime.day, 23, 59, 59))); //.toUtc();
+        }
+      }
       controller.getAttendanceDetails(
         widget.employeeId,
         widget.deviceLinkId,
@@ -73,35 +88,35 @@ class _EmployeeTrackScreenState extends State<EmployeeTrackScreen> {
       body: SafeArea(
           child: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: SingleChildScrollView(
-            child: Column(
+        child: Column(
           children: [
-            SizedBox(
-                width: double.infinity,
-                height: 300,
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Obx(
-                      () => gm.GoogleMap(
-                        initialCameraPosition: controller.googlePlex,
-                        mapType: gm.MapType.normal,
-                        markers: controller.markers.value,
-                        scrollGesturesEnabled: true,
-                        zoomGesturesEnabled: true,
-                        myLocationButtonEnabled: false,
-                        gestureRecognizers: {
-                          Factory<OneSequenceGestureRecognizer>(
-                              () => EagerGestureRecognizer())
-                        },
-                        polylines: controller.polyline.value,
-                        onMapCreated: (c) {
-                          controller.mapController = c;
-                          // controller.manager.setMapId(c.mapId);
-                        },
-                        // onCameraMove: controller.manager.onCameraMove,
-                        // onCameraIdle: controller.manager.updateMap
-                      ),
-                    ))),
+            Expanded(
+              child: SizedBox(
+                  width: double.infinity,
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Obx(
+                        () => gm.GoogleMap(
+                          initialCameraPosition: controller.googlePlex,
+                          mapType: gm.MapType.normal,
+                          markers: controller.markers.value,
+                          scrollGesturesEnabled: true,
+                          zoomGesturesEnabled: true,
+                          myLocationButtonEnabled: false,
+                          gestureRecognizers: {
+                            Factory<OneSequenceGestureRecognizer>(
+                                () => EagerGestureRecognizer())
+                          },
+                          polylines: controller.polyline.value,
+                          onMapCreated: (c) {
+                            controller.mapController = c;
+                            // controller.manager.setMapId(c.mapId);
+                          },
+                          // onCameraMove: controller.manager.onCameraMove,
+                          // onCameraIdle: controller.manager.updateMap
+                        ),
+                      ))),
+            ),
             const SizedBox(
               height: 20,
             ),
@@ -113,9 +128,12 @@ class _EmployeeTrackScreenState extends State<EmployeeTrackScreen> {
             ),
             Obx(() => PopulateRowItem(
                 label: 'Last known location:',
-                value: controller.lastKnownLocation.value))
+                value: controller.lastKnownLocation.value)),
+            const SizedBox(
+              height: 20,
+            ),
           ],
-        )),
+        ),
       )),
       backgroundColor: colorWhite,
     );

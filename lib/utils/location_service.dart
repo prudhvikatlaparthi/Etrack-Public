@@ -92,6 +92,7 @@ Future<void> initializeService() async {
       // auto start service
       autoStart: false,
       isForegroundMode: true,
+      autoStartOnBoot: false,
 
       notificationChannelId: appName,
       initialNotificationTitle: notificationTitle,
@@ -168,10 +169,14 @@ void onStart(ServiceInstance service) async {
 
 Future<void> getLocation(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
+  if (await StorageBox.instance.isStopSync()) {
+    await stopLocationService();
+    return;
+  }
   while (!await StorageBox.instance.isStopSync()) {
     if ((await StorageBox.instance.getImei()).isNullOrEmpty) {
-      showNotification(
-          flutterLocalNotificationsPlugin, "Problem occurred, please check IMEI");
+      showNotification(flutterLocalNotificationsPlugin,
+          "Problem occurred, please check IMEI");
       await Future.delayed(const Duration(minutes: timeInterval));
       continue;
     }

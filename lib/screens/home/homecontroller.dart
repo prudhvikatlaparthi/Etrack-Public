@@ -87,7 +87,7 @@ class HomeController extends GetxController {
           inOutDetails.value = empAtt;
           kPrintLog(empAtt.deviceInfo?.imei);
           await StorageBox.instance.setImei(empAtt.deviceInfo?.imei);
-          if (empAtt.checkOutTime.isNullOrEmpty) {
+          if (empAtt.checkInTime.isNotNullOrEmpty && empAtt.checkOutTime.isNullOrEmpty) {
             if (!await isLocationServiceRunning()) {
               startLocationService();
             }
