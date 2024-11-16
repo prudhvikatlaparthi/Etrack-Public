@@ -9,5 +9,6 @@ const timeInterval = 1;
 const appName = "ETrack";
 const notificationTitle = "ETrack is running";
 const networkErrorMsg = "Something went wrong, please try again";
+const syncErrorMsg = "Please check Sync Status screen, records are pending to Sync.";
 
 

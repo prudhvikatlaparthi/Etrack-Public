@@ -1,4 +1,5 @@
 import 'package:encrypt/encrypt.dart' as en;
+
 import 'global.dart';
 
 final key = en.Key.fromUtf8('n2aHQ+q7whNMugXLPopZnWsqAx1gc5qp');

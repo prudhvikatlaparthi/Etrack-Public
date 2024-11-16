@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:e_track/database/database_helper.dart';
 import 'package:e_track/utils/global.dart';
 import 'package:e_track/utils/socket_connection.dart';
 import 'package:e_track/utils/storagebox.dart';
@@ -11,6 +12,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 
+import '../models/internal/olocation.dart';
 import 'strings.dart';
 
 Future<bool> handleLocationPermission(bool isSilent) async {
@@ -56,7 +58,7 @@ Future<LatLng?> getCurrentPosition() async {
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
 
-  /// OPTIONAL, using custom notification channel id
+  /// OPTIusing custom notification channel id
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
       appName, // id
       notificationTitle, // title
@@ -187,20 +189,22 @@ Future<void> getLocation(
       body = "last synced at ${DateFormat("hh:mm a").format(dateTime)}";
       kPrintLog('FLUTTER BACKGROUND SERVICE: $dateTime');
       try {
+        final msg =
+            '${await StorageBox.instance.getImei()},${DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime.toUtc())},${position.latitude},${position.longitude},0,0,5,1,50';
+        // final dbHelper = DatabaseHelper();
+        final syncBox = DatabaseHelper();
+        syncBox.insertLocation(OLocation(
+            message: msg,
+            timestamp: DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime),
+            synced: 'N'));
         if (await isInternetAvailable()) {
-          SocketConnection socket = SocketConnection.instance;
-          await socket.connect('13.235.142.155', 4307);
-          socket.sendData(
-              '${await StorageBox.instance.getImei()},${DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime.toUtc())},${position.latitude},${position.longitude},0,0,5,1,50',
-              (message) {
-            body = message;
-          });
+          body = await syncLocation(body, syncBox);
         } else {
-          body = "Problem occurred, please check Internet Connection";
+          body = "Please check Internet Connection Offline Synced at ${DateFormat("hh:mm a").format(dateTime)}";
         }
       } catch (e) {
         kPrintLog(e);
-        body = "Problem occurred, please check Socket";
+        body = "Problem occurred, please check Offline Sync";
       }
     } else {
       body = "Problem occurred, please check mobile GPS";
@@ -210,6 +214,24 @@ Future<void> getLocation(
     showNotification(flutterLocalNotificationsPlugin, body);
     await Future.delayed(const Duration(minutes: timeInterval));
   }
+}
+
+Future<String> syncLocation(String bodyM, DatabaseHelper syncBox) async {
+  String body = bodyM;
+  try {
+    // final dbHelper = DatabaseHelper();
+    SocketConnection socket = SocketConnection.instance;
+    await socket.connect('13.235.142.155', 4307);
+    final unSyncedLocation = await syncBox.getUnSyncedLocations();
+    for (var loc in unSyncedLocation) {
+      socket.sendData(loc.message, (message) {});
+      await syncBox.removeLocation([loc.id ?? 0]);
+    }
+  } catch (e) {
+    kPrintLog(e);
+    body = "Problem occurred, please check Socket";
+  }
+  return body;
 }
 
 void showNotification(

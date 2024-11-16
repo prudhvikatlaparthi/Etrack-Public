@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../../database/database_helper.dart';
 import '../../utils/location_service.dart';
 import '../../utils/strings.dart';
 
@@ -61,6 +62,11 @@ class HomeController extends GetxController {
     kPrintLog("Sign In ${position?.latitude} ${position?.longitude}");
     if (inOutDetails.value.checkInTime?.isNotNullOrEmpty == true) {
       // sign out
+      if ((await DatabaseHelper().getUnSyncedLocations()).isNotEmpty) {
+        dismissLoader();
+        showToast(message: syncErrorMsg);
+        return;
+      }
       await stopLocationService();
       await signInOut(position);
     } else {
@@ -87,7 +93,8 @@ class HomeController extends GetxController {
           inOutDetails.value = empAtt;
           kPrintLog(empAtt.deviceInfo?.imei);
           await StorageBox.instance.setImei(empAtt.deviceInfo?.imei);
-          if (empAtt.checkInTime.isNotNullOrEmpty && empAtt.checkOutTime.isNullOrEmpty) {
+          if (empAtt.checkInTime.isNotNullOrEmpty &&
+              empAtt.checkOutTime.isNullOrEmpty) {
             if (!await isLocationServiceRunning()) {
               startLocationService();
             }

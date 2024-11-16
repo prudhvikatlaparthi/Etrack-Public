@@ -58,6 +58,7 @@ Future<void> main() async {
     final deviceInfo = await deviceInfoPlugin.iosInfo;
     await StorageBox.instance.setDeviceID(deviceInfo.identifierForVendor);
   }
+
   runApp(const MyApp());
 }
 

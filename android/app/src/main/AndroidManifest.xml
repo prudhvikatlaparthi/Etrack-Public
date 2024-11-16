@@ -38,7 +38,7 @@
             />
 
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCuq1z1GjG84lrm3wyxLTL95LxjidQ8ZG4"/>
+            android:value="AIzaSyCz9hTwCYjU89OWVPhprdaK5hrj49GCBwQ"/>
 
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />
     </application>

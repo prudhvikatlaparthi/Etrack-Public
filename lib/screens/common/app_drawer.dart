@@ -1,13 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:e_track/database/database_helper.dart';
 import 'package:e_track/screens/change_password/change_password_screen.dart';
 import 'package:e_track/screens/employees_attendance/employee_attendance_controller.dart';
 import 'package:e_track/screens/employees_attendance/employees_attendance_screen.dart';
 import 'package:e_track/screens/home/homecontroller.dart';
+import 'package:e_track/screens/sync_status/sync_screen.dart';
 import 'package:e_track/utils/colors.dart';
 import 'package:e_track/utils/storagebox.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../utils/global.dart';
+import '../../utils/strings.dart';
 import '../change_password/change_password_controller.dart';
 import '../employees/employee_controller.dart';
 import '../employees/employees_screen.dart';
@@ -33,12 +37,34 @@ class AppDrawer extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  FutureBuilder(
+                  FutureBuilder<String>(
                     future: getProfileImage(),
-                    builder: (c, t) => CircleAvatar(
+                    builder: (c, t) => t.hasData ?
+                        CachedNetworkImage(
+                      imageUrl:
+                          t.data!,
+                      placeholder: (c, u) => const CircleAvatar(
+                        backgroundColor: colorWhite,
+                        radius: 36,
+                        backgroundImage:
+                            AssetImage("assets/images/icons/user.png"),
+                      ),
+                      errorWidget: (c, u, e) => const CircleAvatar(
+                        backgroundColor: colorWhite,
+                        radius: 36,
+                        backgroundImage:
+                            AssetImage("assets/images/icons/user.png"),
+                      ),
+                      imageBuilder: (c, m) => CircleAvatar(
+                        backgroundColor: colorWhite,
+                        radius: 36,
+                        backgroundImage: m,
+                      ),
+                    ) : const CircleAvatar(
                       backgroundColor: colorWhite,
                       radius: 36,
-                      backgroundImage: t.data,
+                      backgroundImage:
+                      AssetImage("assets/images/icons/user.png"),
                     ),
                   ),
                   const Spacer(),
@@ -139,15 +165,48 @@ class AppDrawer extends StatelessWidget {
             ),
             ListTile(
               title: const Text(
+                'Sync Status',
+                style: TextStyle(
+                  color: colorBlack,
+                  fontSize: 16,
+                ),
+              ),
+              onTap: () async {
+                Get.back();
+                await Future.delayed(const Duration(milliseconds: 400), () {
+                  var showSync = !(controller.inOutDetails.value.checkInTime
+                              ?.isNotNullOrEmpty ==
+                          true &&
+                      controller.inOutDetails.value.checkOutTime
+                              ?.isNotNullOrEmpty ==
+                          true);
+                  if (showSync) {
+                    showSync = controller
+                            .inOutDetails.value.checkInTime?.isNotNullOrEmpty ==
+                        true;
+                  }
+
+                  Get.to(() => SyncScreen(
+                        showSync: showSync,
+                      ));
+                });
+              },
+            ),
+            ListTile(
+              title: const Text(
                 'Log out',
                 style: TextStyle(
                   color: colorBlack,
                   fontSize: 16,
                 ),
               ),
-              onTap: () {
+              onTap: () async {
                 Get.back();
-                logOut();
+                if ((await DatabaseHelper().getUnSyncedLocations()).isEmpty) {
+                  logOut();
+                } else {
+                  showToast(message: syncErrorMsg);
+                }
               },
             ),
             ListTile(
@@ -163,13 +222,13 @@ class AppDrawer extends StatelessWidget {
         ));
   }
 
-  Future<ImageProvider<Object>> getProfileImage() async {
+  Future<String> getProfileImage() async {
     final profilePic = await StorageBox.instance.getProfilePic();
     if (profilePic.isNotNullOrEmpty &&
         !profilePic!.contains("uploads/no-image.png")) {
-      return NetworkImage(profilePic);
+      return profilePic;
     } else {
-      return const AssetImage("assets/images/icons/user.png");
+      return "assets/images/icons/user.png";
     }
   }
 }
